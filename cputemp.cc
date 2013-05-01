@@ -10,59 +10,91 @@
 using namespace std;
 using namespace cputemp;
 
-const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit]";
+const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-c|--cpus] [-g|--gpus] [-d #|--delay_sec=#]";
+
+template<typename T,typename U>
+void print (const T &s, const U &chips, bool fahrenheit)
+{
+    for (auto chip : chips)
+    {
+        for (auto temp : s.get_temperatures (chip))
+        {
+            double t = fahrenheit ? ctof (temp.current) : temp.current;
+            clog << ' ' << t;
+            if (temp.current > temp.critical)
+                clog << '!';
+            else if (temp.current > temp.high)
+                clog << '^';
+        }
+        clog << endl;
+    }
+}
 
 int main (int argc, char **argv)
 {
     try
     {
         // parse the options
-        bool fahrenheit;
+        bool fahrenheit = false;
+        bool cpus = true;
+        bool gpus = false;
+        unsigned delay_sec = 1;
         static struct option options[] =
         {
-            {"fahrenheit", 0, 0, 'f'},
             {"help", 0, 0, 'h'},
+            {"fahrenheit", 0, 0, 'f'},
+            {"cpus", 0, 0, 'c'},
+            {"gpus", 0, 0, 'g'},
+            {"delay_sec", 1, 0, 'd'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "fh", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "hfcgd:", options, &option_index)) != -1)
         {
             switch (arg)
             {
-                case 'f':
-                fahrenheit = true;
-                break;
-
                 case 'h':
                 clog << usage << endl;
                 return 0;
+                case 'f':
+                fahrenheit = true;
+                break;
+                case 'c':
+                cpus = !cpus;
+                break;
+                case 'g':
+                gpus = !gpus;
+                break;
+                case 'd':
+                delay_sec = atof (optarg);
+                break;
             }
         };
+        // print the options
+        clog << "fahrenheit " << fahrenheit << endl;
+        clog << "cpus " << cpus << endl;
+        clog << "gpus " << gpus << endl;
+        clog << "delay_sec " << delay_sec << endl;
+
+        // you must report on at least one chip type
+        if (!cpus && !gpus)
+            throw runtime_error ("nothing to do!");
 
         // init the sensors library
         sensors s;
-        std::clog << "libsensors version " << s.get_version () << std::endl;
+        clog << "libsensors version " << s.get_version () << endl;
 
-        // get CPUs and print current temperatures
-        sensors::chips cpus = s.get_isa_chips ();
-        std::clog << "CPUs" << std::endl;
-        for (auto chip : cpus)
-            for (auto temp : s.get_temperatures (chip))
-                if (fahrenheit)
-                    std::clog << ctof (temp) << std::endl;
-                else
-                    std::clog << temp << std::endl;
+        for (;;) // ever
+        {
+            if (cpus)
+                print (s, s.get_isa_chips (), fahrenheit);
 
-        // get GPUs and print current temperatures
-        sensors::chips gpus = s.get_pci_chips ();
-        std::clog << "GPUs" << std::endl;
-        for (auto chip : gpus)
-            for (auto temp : s.get_temperatures (chip))
-                if (fahrenheit)
-                    std::clog << ctof (temp) << std::endl;
-                else
-                    std::clog << temp << std::endl;
+            if (gpus)
+                print (s, s.get_pci_chips (), fahrenheit);
+
+            sleep (delay_sec);
+        }
 
         return 0;
     }

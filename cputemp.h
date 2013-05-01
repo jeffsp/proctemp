@@ -30,25 +30,7 @@ namespace cputemp
         double current;
         double high;
         double critical;
-        friend std::ostream& operator<< (std::ostream &s, const temperature &t)
-        {
-            s << '\t' << t.current << '\t' << t.high << '\t' << t.critical;
-            return s;
-        }
     };
-    /// @brief convert from fahrenheit to celsius
-    ///
-    /// @param c temperature in celsius
-    ///
-    /// @return temperature in fahrenheit
-    temperature ctof (const temperature &c)
-    {
-        temperature f;
-        f.current = ctof (c.current);
-        f.high = ctof (c.high);
-        f.critical = ctof (c.critical);
-        return f;
-    }
     /// @brief wrapper for sensors/sensors.h functionality
     class sensors
     {

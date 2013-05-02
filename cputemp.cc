@@ -36,7 +36,7 @@ int main (int argc, char **argv)
     {
         // parse the options
         bool fahrenheit = false;
-        bool cpus = true;
+        bool cpus = false;
         bool gpus = false;
         static struct option options[] =
         {
@@ -59,10 +59,10 @@ int main (int argc, char **argv)
                 fahrenheit = true;
                 break;
                 case 'c':
-                cpus = !cpus;
+                cpus = true;
                 break;
                 case 'g':
-                gpus = !gpus;
+                gpus = true;
                 break;
             }
         };
@@ -73,7 +73,7 @@ int main (int argc, char **argv)
 
         // you must report on at least one chip type
         if (!cpus && !gpus)
-            throw runtime_error ("nothing to do!");
+            cpus = true;
 
         // init the sensors library
         sensors s;

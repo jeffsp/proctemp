@@ -11,7 +11,7 @@ out = 'build'
 # global definitions
 SOURCES='*.cc'
 CXXFLAGS=['-fopenmp','-Wall','-std=c++0x']
-INCLUDES='. .. ../../horny_toad ../../jack_rabbit ../noise_synthesis'
+INCLUDES=''
 LIBS=['gomp','rt','sensors']
 
 # variant specific build flags
@@ -26,11 +26,13 @@ def configure(ctx):
     ctx.load('compiler_cxx')
     ctx.env.CXXFLAGS=DEBUG_CXXFLAGS
     ctx.env.SOURCES=glob.glob(SOURCES)
+    ctx.check_cfg(package='gtk+-3.0',args=['--cflags','--libs'])
 
     ctx.setenv('release')
     ctx.load('compiler_cxx')
     ctx.env.CXXFLAGS=RELEASE_CXXFLAGS
     ctx.env.SOURCES=glob.glob(SOURCES)
+    ctx.check_cfg(package='gtk+-3.0',args=['--cflags','--libs'])
 
 def options(opt):
 

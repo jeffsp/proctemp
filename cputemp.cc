@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cputemp;
 
-const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-c|--cpus] [-g|--gpus]";
+const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-g|--gpus]";
 
 template<typename T,typename U>
 void print (const T &s, const U &chips, bool fahrenheit)
@@ -36,19 +36,17 @@ int main (int argc, char **argv)
     {
         // parse the options
         bool fahrenheit = false;
-        bool cpus = false;
         bool gpus = false;
         static struct option options[] =
         {
             {"help", 0, 0, 'h'},
             {"fahrenheit", 0, 0, 'f'},
-            {"cpus", 0, 0, 'c'},
             {"gpus", 0, 0, 'g'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "hfcgd:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "hfgd:", options, &option_index)) != -1)
         {
             switch (arg)
             {
@@ -58,9 +56,6 @@ int main (int argc, char **argv)
                 case 'f':
                 fahrenheit = true;
                 break;
-                case 'c':
-                cpus = true;
-                break;
                 case 'g':
                 gpus = true;
                 break;
@@ -68,21 +63,15 @@ int main (int argc, char **argv)
         };
         // print the options
         clog << "fahrenheit " << fahrenheit << endl;
-        clog << "cpus " << cpus << endl;
         clog << "gpus " << gpus << endl;
-
-        // you must report on at least one chip type
-        if (!cpus && !gpus)
-            cpus = true;
 
         // init the sensors library
         sensors s;
         clog << "libsensors version " << s.get_version () << endl;
 
-        if (cpus)
+        if (!gpus)
             print (s, s.get_isa_chips (), fahrenheit);
-
-        if (gpus)
+        else
             print (s, s.get_pci_chips (), fahrenheit);
 
         return 0;

@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cputemp;
 
-const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-c|--cpus] [-g|--gpus] [-d #|--delay_sec=#]";
+const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-c|--cpus] [-g|--gpus]";
 
 template<typename T,typename U>
 void print (const T &s, const U &chips, bool fahrenheit)
@@ -38,14 +38,12 @@ int main (int argc, char **argv)
         bool fahrenheit = false;
         bool cpus = true;
         bool gpus = false;
-        unsigned delay_sec = 1;
         static struct option options[] =
         {
             {"help", 0, 0, 'h'},
             {"fahrenheit", 0, 0, 'f'},
             {"cpus", 0, 0, 'c'},
             {"gpus", 0, 0, 'g'},
-            {"delay_sec", 1, 0, 'd'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
@@ -66,16 +64,12 @@ int main (int argc, char **argv)
                 case 'g':
                 gpus = !gpus;
                 break;
-                case 'd':
-                delay_sec = atof (optarg);
-                break;
             }
         };
         // print the options
         clog << "fahrenheit " << fahrenheit << endl;
         clog << "cpus " << cpus << endl;
         clog << "gpus " << gpus << endl;
-        clog << "delay_sec " << delay_sec << endl;
 
         // you must report on at least one chip type
         if (!cpus && !gpus)
@@ -85,16 +79,11 @@ int main (int argc, char **argv)
         sensors s;
         clog << "libsensors version " << s.get_version () << endl;
 
-        for (;;) // ever
-        {
-            if (cpus)
-                print (s, s.get_isa_chips (), fahrenheit);
+        if (cpus)
+            print (s, s.get_isa_chips (), fahrenheit);
 
-            if (gpus)
-                print (s, s.get_pci_chips (), fahrenheit);
-
-            sleep (delay_sec);
-        }
+        if (gpus)
+            print (s, s.get_pci_chips (), fahrenheit);
 
         return 0;
     }

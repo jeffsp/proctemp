@@ -13,3 +13,4 @@ run: waf
 	./build/debug/cputemp -f
 	./build/debug/cputemp -g
 	./build/debug/cputemp -f -g
+	./build/debug/cputempx

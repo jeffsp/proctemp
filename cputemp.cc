@@ -20,11 +20,13 @@ void print (const T &s, const U &chips, bool fahrenheit)
         for (auto temp : s.get_temperatures (chip))
         {
             double t = fahrenheit ? ctof (temp.current) : temp.current;
+            double h = fahrenheit ? ctof (temp.high) : temp.high;
+            double c = fahrenheit ? ctof (temp.critical) : temp.critical;
             clog << ' ' << t;
-            if (temp.current > temp.critical)
-                clog << '!';
+            if (t > c)
+                clog << ">" << c << "!!!";
             else if (temp.current > temp.high)
-                clog << '^';
+                clog << ">" << h;
         }
         clog << endl;
     }
@@ -69,6 +71,7 @@ int main (int argc, char **argv)
         sensors s;
         clog << "libsensors version " << s.get_version () << endl;
 
+        clog << "checking " << (gpus ? "GPUs" : "CPUs") <<  endl;
         if (!gpus)
             print (s, s.get_isa_chips (), fahrenheit);
         else

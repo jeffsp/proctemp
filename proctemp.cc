@@ -13,8 +13,9 @@ using namespace proctemp;
 const string usage = "usage: proctemp [-h|--help] [-f|--fahrenheit] [-g|--gpus]";
 
 template<typename T,typename U>
-void print (const T &s, const U &chips, bool fahrenheit)
+int check (const T &s, const U &chips, bool fahrenheit)
 {
+    int status = 0;
     for (auto chip : chips)
     {
         for (auto temp : s.get_temperatures (chip))
@@ -24,12 +25,19 @@ void print (const T &s, const U &chips, bool fahrenheit)
             double c = fahrenheit ? ctof (temp.critical) : temp.critical;
             clog << ' ' << t;
             if (t > c)
+            {
+                status = max (status, 2);
                 clog << ">" << c << "!!!";
-            else if (temp.current > temp.high)
+            }
+            else if (t > h)
+            {
+                status = max (status, 1);
                 clog << ">" << h;
+            }
         }
         clog << endl;
     }
+    return status;
 }
 
 int main (int argc, char **argv)
@@ -72,12 +80,11 @@ int main (int argc, char **argv)
         clog << "libsensors version " << s.get_version () << endl;
 
         clog << "checking " << (gpus ? "GPUs" : "CPUs") <<  endl;
-        if (!gpus)
-            print (s, s.get_isa_chips (), fahrenheit);
-        else
-            print (s, s.get_pci_chips (), fahrenheit);
+        int status = gpus ?
+            check (s, s.get_pci_chips (), fahrenheit) :
+            check (s, s.get_isa_chips (), fahrenheit);
 
-        return 0;
+        return status;
     }
     catch (const exception &e)
     {

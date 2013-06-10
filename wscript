@@ -57,5 +57,5 @@ def build(ctx):
             waflib.Options.commands.insert(0, ctx.cmd+'_'+x)
     else:
         # the executable name is the filename without the extension
-        ctx.program(source='cputemp.cc',target='cputemp',includes=INCLUDES,lib=LIBS)
-        ctx.program(source='cputempx.cc',target='cputempx',use='GTK+-3.0',includes=INCLUDES,lib=LIBS)
+        ctx.program(source='proctemp.cc',target='proctemp',includes=INCLUDES,lib=LIBS)
+        ctx.program(source='proctempx.cc',target='proctempx',use='GTK+-3.0',includes=INCLUDES,lib=LIBS)

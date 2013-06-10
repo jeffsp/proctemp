@@ -1,16 +1,16 @@
-/// @file cputemp.cc
-/// @brief get cpu temperature
+/// @file proctemp.cc
+/// @brief get proc temperature
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @version 0.1
 /// @date 2011-03-14
 
-#include "cputemp.h"
+#include "proctemp.h"
 #include <getopt.h>
 
 using namespace std;
-using namespace cputemp;
+using namespace proctemp;
 
-const string usage = "usage: cputemp [-h|--help] [-f|--fahrenheit] [-g|--gpus]";
+const string usage = "usage: proctemp [-h|--help] [-f|--fahrenheit] [-g|--gpus]";
 
 template<typename T,typename U>
 void print (const T &s, const U &chips, bool fahrenheit)

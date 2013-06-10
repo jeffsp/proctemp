@@ -1,15 +1,15 @@
-/// @file cputempx.cc
-/// @brief xwindows version of cputemp
+/// @file proctempx.cc
+/// @brief xwindows version of proctemp
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @version 1.0
 /// @date 2013-05-02
 
-#include "cputemp.h"
+#include "proctemp.h"
 #include <iostream>
 #include <gtk/gtk.h>
 
 using namespace std;
-using namespace cputemp;
+using namespace proctemp;
 
 int main (int argc, char *argv[])
 {

@@ -1,11 +1,11 @@
-/// @file cputemp.h
-/// @brief cputemp
+/// @file proctemp.h
+/// @brief proctemp
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @version 1.0
 /// @date 2013-04-30
 
-#ifndef CPUTEMP_H
-#define CPUTEMP_H
+#ifndef PROCTEMP_H
+#define PROCTEMP_H
 
 #include <iostream>
 #include <sensors/sensors.h>
@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace cputemp
+namespace proctemp
 {
     /// @brief convert from fahrenheit to celsius
     ///

@@ -59,3 +59,4 @@ def build(ctx):
         # the executable name is the filename without the extension
         ctx.program(source='proctemp.cc',target='proctemp',includes=INCLUDES,lib=LIBS)
         ctx.program(source='proctempx.cc',target='proctempx',use='GTK+-3.0',includes=INCLUDES,lib=LIBS)
+        ctx.program(source='proctempn.cc',target='proctempn',includes=INCLUDES,lib=LIBS+['ncurses'])

@@ -9,8 +9,8 @@ waf:
 	waf
 
 run: waf
+	./build/debug/proctempn
 	./build/debug/proctemp
 	./build/debug/proctemp -f
 	./build/debug/proctemp -g
 	./build/debug/proctemp -f -g
-	./build/debug/proctempx

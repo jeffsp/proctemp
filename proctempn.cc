@@ -6,8 +6,8 @@
 
 #include "proctemp.h"
 #include <iostream>
+#include <sstream>
 #include <ncurses.h>
-#include <signal.h>
 
 using namespace std;
 using namespace proctemp;
@@ -18,43 +18,56 @@ class ncurses
     int rows, cols;
     vector<string> buses;
     public:
-    ncurses ()
+    ncurses () { init (); }
+    ~ncurses () { release (); }
+    void init ()
     {
         initscr ();
         raw ();
         keypad (stdscr, 1);
         noecho ();
+        curs_set (0); // make cursor invisible
+        getmaxyx (stdscr, rows, cols);
+        for (size_t i = 0; i < buses.size (); ++i)
+            mvprintw (0, i * cols / 2, buses[i].c_str());
+        stringstream s;
+        s << rows << " X " << cols;
+        mvprintw (rows - 1, cols - s.str ().size (), s.str ().c_str ());
+        //mvprintw (rows - 1, 1, "libsensors version %s\n", s.get_version ().c_str ());
+        mvprintw (rows - 1, 0, "press 'q' to quit");
+        s.str ("");
+        //s << "ncurses version " << NCURSES_VERSION_MAJOR << '.' << NCURSES_VERSION_MINOR;
+        s << "proctemp version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
+        mvprintw (rows - 1, cols / 2 - s.str ().size () / 2, s.str ().c_str ());
+        refresh ();
     }
-    ~ncurses ()
+    void release ()
     {
         endwin ();
     }
     void set_buses (vector<string> &b)
     {
         buses = b;
-        redraw ();
+        for (size_t i = 0; i < buses.size (); ++i)
+            mvprintw (0, i * cols / 2, buses[i].c_str());
+        refresh ();
     }
     void temp (int i, int j, double t, double high, double critical) const
     {
         mvprintw (j + 1, i * cols / 2, "%.0f %.0f %.0f", t, high, critical);
     }
-    void redraw ()
+
+    void update ()
     {
-        erase ();
-        for (size_t i = 0; i < buses.size (); ++i)
-            mvprintw (0, i * cols / 2, buses[i].c_str());
-        getmaxyx (stdscr, rows, cols);
-        //mvprintw (rows - 1, 1, "libsensors version %s\n", s.get_version ().c_str ());
-        mvprintw (rows - 1, 0, "press 'q' to quit");
-        //mvprintw (rows - 2, 0, "ncurses version %d.%d\n", NCURSES_VERSION_MAJOR,  NCURSES_VERSION_MINOR);
+        if (is_term_resized (rows, cols))
+        {
+            erase ();
+            release ();
+            init ();
+        }
         refresh ();
     }
-} n;
-
-void resize (int)
-{
-    n.redraw ();
-}
+};
 
 template<typename C,typename N,typename T>
 void check (int bus, const C &chips, const N &n, const T &s, bool fahrenheit)
@@ -89,8 +102,8 @@ int main (int argc, char *argv[])
 {
     try
     {
-        // install signal handler
-        signal (SIGWINCH, resize);
+        // init terminal window
+        ncurses n;
         // label buses
         vector<string> b {"CPU", "GPU"};
         n.set_buses (b);
@@ -113,7 +126,7 @@ int main (int argc, char *argv[])
                     fahrenheit = !fahrenheit;
                 break;
             }
-            refresh ();
+            n.update ();
         }
         return 0;
     }

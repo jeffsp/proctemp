@@ -15,6 +15,10 @@
 
 namespace proctemp
 {
+    /// @brief version info
+    const int MAJOR_REVISION = 0;
+    const int MINOR_REVISION = 1;
+
     /// @brief convert from fahrenheit to celsius
     ///
     /// @param c temperature in celsius

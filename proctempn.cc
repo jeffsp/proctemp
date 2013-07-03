@@ -51,14 +51,42 @@ class options
     /// @brief i/o helper
     friend std::ostream& operator<< (std::ostream &s, const options &opts)
     {
-        s << opts.fahrenheit;
+        s << "proctemp " << MAJOR_REVISION << ' ' << MINOR_REVISION << endl;
+        s << "fahrenheit " << opts.fahrenheit << endl;
         return s;
     }
     /// @brief i/o helper
     friend std::istream& operator>> (std::istream &s, options &opts)
     {
-        opts.dirty = false;
-        s >> opts.fahrenheit;
+        try
+        {
+            string name;
+            int major, minor;
+            s >> name >> major >> minor;
+            clog << name << ' ' << major << ' ' << minor << endl;
+            if (name != "proctemp")
+                throw runtime_error ("warning: error parsing revision number");
+            clog << "parsing proctemp configure file with revision number " << major << "." << minor << endl;
+            if (major != MAJOR_REVISION)
+                throw runtime_error ("warning: configuration file major revision is not the same this programs's major revision number");
+            if (minor > MINOR_REVISION)
+                throw runtime_error ("warning: configuration file revision number is newer than this program's revision number");
+            bool value;
+            s >> name >> value;
+            clog << name << ' ' << value << endl;
+            if (name != "fahrenheit")
+                throw runtime_error ("warning: error parsing fahrenheit option");
+            opts.set_fahrenheit (value);
+            // if it was read correctly, it won't need to get written back out
+            opts.dirty = false;
+        }
+        catch (const exception &e)
+        {
+            cerr << e.what () << endl;
+            clog << "warning: cannot parse configuration file" << endl;
+            // set dirty so it will get written
+            opts.dirty = true;
+        }
         return s;
     }
 };
@@ -141,8 +169,7 @@ class user_interface
             case 'T':
             opts.set_fahrenheit (!opts.get_fahrenheit ());
             break;
-            case 'd':
-            case 'D':
+            case '!':
             debug = !debug;
             release ();
             init ();
@@ -196,7 +223,7 @@ class user_interface
                         continue;
                     temperature t = temps[bus][i][n];
                     // print the cpu number
-                    if (debug && n == 0)
+                    if (debug && !(rand () % temps[bus][i].size ()))
                         t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
                     stringstream ss;
                     ss << n;
@@ -294,7 +321,7 @@ class user_interface
             ss << "YOU ARE IN DEBUG MODE.";
             text ({}, row++, cols / 2, ss.str ().c_str ());
             ss.str ("");
-            ss << "PRESS 'D' TO TURN OFF DEBUG MODE.";
+            ss << "PRESS '!' TO TURN OFF DEBUG MODE.";
             text ({}, row++, cols / 2, ss.str ().c_str ());
         }
     }
@@ -334,6 +361,7 @@ void get_temps (const S &s, T &temps, U &bus_names)
 /// @param fn filename
 void read (options &opts, const string &fn)
 {
+    clog << "reading configuration file " << fn << endl;
     ifstream ifs (fn.c_str ());
     if (!ifs)
         throw runtime_error ("could not open config file for reading");
@@ -346,6 +374,7 @@ void read (options &opts, const string &fn)
 /// @param fn filename
 void write (const options &opts, const string &fn)
 {
+    clog << "writing configuration file " << fn << endl;
     ofstream ofs (fn.c_str ());
     if (!ofs)
         throw runtime_error ("could not open config file for writing");
@@ -413,7 +442,9 @@ int main (int argc, char *argv[])
             // interpret user input
             ui.process (getch ());
         }
-        // save them if any changed
+        // close down console window
+        ui.release ();
+        // save options if any changed
         if (opts.is_dirty ())
             write (opts, config_fn);
         return 0;

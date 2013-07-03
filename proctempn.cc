@@ -79,6 +79,7 @@ class user_interface
     static const int GREEN = COLOR_PAIR(2);
     static const int YELLOW = COLOR_PAIR(3);
     static const int RED = COLOR_PAIR(4);
+    static const int BLUE = COLOR_PAIR(5);
     public:
     /// @brief constructor
     user_interface (options &opts)
@@ -110,6 +111,7 @@ class user_interface
         init_pair (2, COLOR_GREEN, -1);
         init_pair (3, COLOR_YELLOW, -1);
         init_pair (4, COLOR_RED, -1);
+        init_pair (5, COLOR_BLUE, -1);
         timeout (1000); // timeout in ms
     }
     /// @brief ncurses cleanup
@@ -165,6 +167,18 @@ class user_interface
     void show_temps (const T &temps, const U &names) const
     {
         assert (temps.size () == names.size ());
+        // get the width of the cpu number column
+        size_t max_cpus = 0;
+        for (size_t i = 0; i < temps.size (); ++i)
+            if (temps[i].size () > max_cpus)
+                max_cpus = temps[i].size ();
+        stringstream ss;
+        ss << max_cpus;
+        // length of largest number plus a space
+        const int indent1 = ss.str ().size () + 1;
+        // assumes temps are 3 digits at most, plus the C or F, plus a space
+        const int indent2 = indent1 + 5;
+        // print the temperatures
         auto row = 0;
         for (size_t i = 0; i < names.size (); ++i)
         {
@@ -186,11 +200,10 @@ class user_interface
                     color = YELLOW;
                 if (t.current >= t.critical)
                     color = RED;
-                text ({A_BOLD, color}, row, 3, "%4s", ss.str ().c_str ());
+                text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
                 // print the bar
-                const int left = 8;
-                const int size = cols / 2 - left - 5;
-                temp_bar (n, row++, left, size, t);
+                const int size = cols / 2 - indent2 - 5;
+                temp_bar (n, row++, indent2, size, t);
             }
         }
     }
@@ -224,7 +237,7 @@ class user_interface
             if (k < len)
                 text ({A_BOLD, A_REVERSE, color}, i, j + k, " ");
             else
-                text ({A_BOLD, color}, i, j + k, "-");
+                text ({color}, i, j + k, "-");
         }
     }
     /// @brief draw normal style text
@@ -250,13 +263,13 @@ class user_interface
         stringstream ss;
         ss.str ("");
         ss << "proctemp version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
-        text ({}, rows - 1, 0, ss.str ().c_str ());
+        text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
         ss << "T = change Temperature scale";
-        text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
+        text ({}, row++, cols / 2, ss.str ().c_str ());
         ss.str ("");
         ss << "Q = Quit";
-        text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
+        text ({}, row++, cols / 2, ss.str ().c_str ());
         if (debug)
         {
             ++row;
@@ -269,10 +282,10 @@ class user_interface
             ++row;
             ss.str ("");
             ss << "YOU ARE IN DEBUG MODE.";
-            text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, cols / 2, ss.str ().c_str ());
             ss.str ("");
             ss << "PRESS 'D' TO TURN OFF DEBUG MODE.";
-            text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, cols / 2, ss.str ().c_str ());
         }
     }
 };

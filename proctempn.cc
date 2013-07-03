@@ -168,7 +168,7 @@ class user_interface
         auto row = 0;
         for (size_t i = 0; i < names.size (); ++i)
         {
-            text ({A_BOLD}, row++, 0, names[i].c_str ());
+            text ({}, row++, 0, names[i].c_str ());
             for (size_t n = 0; n < temps[i].size (); ++n)
             {
                 temp_bar (n, row++, 0, temps[i][n]);
@@ -191,17 +191,24 @@ class user_interface
         stringstream ss;
         ss << n;
         text ({}, i, 0, ss.str ().c_str ());
-        const int LEFT = 4;
+        const int LEFT = 8;
         const int RIGHT = 5;
         const int SIZE = cols / 2 - LEFT - RIGHT;
-        text ({A_BOLD}, i, j + LEFT - 1, "[");
-        text ({A_BOLD}, i, j + LEFT + 1 + SIZE + 1, "]");
+        text ({A_BOLD}, i, j + LEFT , "[");
+        text ({A_BOLD}, i, j + LEFT + SIZE + 1, "]");
         ss.str ("");
         ss << int (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
         const int MIN = 40;
         const int MAX = t.critical + 5;
         int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
         int len = SIZE * (current - MIN) / (MAX - MIN);
+        int color = GREEN;
+        if (t.current >= t.high)
+            color = YELLOW;
+        if (t.current >= t.critical)
+            color = RED;
+        // print the numerical value
+        text ({A_BOLD, color}, i, 3, ss.str ().c_str ());
         for (int k = 0; k < SIZE; ++k)
         {
             int color;
@@ -215,8 +222,6 @@ class user_interface
                 text ({A_BOLD, A_REVERSE, color}, i, j + LEFT + 1 + k, " ");
             else
                 text ({A_BOLD, color}, i, j + LEFT + 1 + k, "-");
-            // print the numerical value
-            text ({A_BOLD, color}, i, j + LEFT + 1 + SIZE - ss.str ().size (), ss.str ().c_str ());
         }
     }
     /// @brief draw normal style text
@@ -261,10 +266,10 @@ class user_interface
             ++row;
             ss.str ("");
             ss << "YOU ARE IN DEBUG MODE.";
-            text ({A_BOLD,A_BLINK}, row++, cols / 2, ss.str ().c_str ());
+            text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
             ss.str ("");
             ss << "PRESS 'D' TO TURN OFF DEBUG MODE.";
-            text ({A_BOLD,A_BLINK}, row++, cols / 2, ss.str ().c_str ());
+            text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
         }
     }
 };

@@ -169,9 +169,10 @@ class user_interface
         assert (temps.size () == names.size ());
         // get the width of the cpu number column
         size_t max_cpus = 0;
-        for (size_t i = 0; i < temps.size (); ++i)
-            if (temps[i].size () > max_cpus)
-                max_cpus = temps[i].size ();
+        for (size_t bus = 0; bus < temps.size (); ++bus)
+            for (size_t i = 0; i < temps[bus].size (); ++i)
+                if (temps[bus][i].size () > max_cpus)
+                    max_cpus = temps[bus][i].size ();
         stringstream ss;
         ss << max_cpus;
         // length of largest number plus a space
@@ -180,30 +181,39 @@ class user_interface
         const int indent2 = indent1 + 5;
         // print the temperatures
         auto row = 0;
-        for (size_t i = 0; i < names.size (); ++i)
+        for (size_t bus = 0; bus < temps.size (); ++bus)
         {
-            text ({}, row++, 0, names[i].c_str ());
-            for (size_t n = 0; n < temps[i].size (); ++n)
+            for (size_t i = 0; i < temps[bus].size (); ++i)
             {
-                temperature t = temps[i][n];
-                // print the cpu number
-                if (debug && n == 0)
-                    t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
-                stringstream ss;
-                ss << n;
-                text ({}, row, 0, ss.str ().c_str ());
-                // print the numerical value
-                ss.str ("");
-                ss << int (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
-                int color = GREEN;
-                if (t.current >= t.high)
-                    color = YELLOW;
-                if (t.current >= t.critical)
-                    color = RED;
-                text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
-                // print the bar
-                const int size = cols / 2 - indent2 - 5;
-                temp_bar (n, row++, indent2, size, t);
+                // don't print on last line
+                if (row + 1 == rows)
+                    continue;
+                text ({}, row++, 0, "%s(%d)", names[bus].c_str (), i);
+                for (size_t n = 0; n < temps[bus][i].size (); ++n)
+                {
+                    // don't print on last line
+                    if (row + 1 == rows)
+                        continue;
+                    temperature t = temps[bus][i][n];
+                    // print the cpu number
+                    if (debug && n == 0)
+                        t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
+                    stringstream ss;
+                    ss << n;
+                    text ({}, row, 0, ss.str ().c_str ());
+                    // print the numerical value
+                    ss.str ("");
+                    ss << int (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
+                    int color = GREEN;
+                    if (t.current >= t.high)
+                        color = YELLOW;
+                    if (t.current >= t.critical)
+                        color = RED;
+                    text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                    // print the bar
+                    const int size = cols / 2 - indent2 - 5;
+                    temp_bar (n, row++, indent2, size, t);
+                }
             }
         }
     }
@@ -237,7 +247,7 @@ class user_interface
             if (k < len)
                 text ({A_BOLD, A_REVERSE, color}, i, j + k, " ");
             else
-                text ({color}, i, j + k, "-");
+                text ({A_BOLD, color}, i, j + k, "-");
         }
     }
     /// @brief draw normal style text
@@ -301,18 +311,21 @@ class user_interface
 template<typename S,typename T,typename U>
 void get_temps (const S &s, T &temps, U &bus_names)
 {
+    // check two buses
+    temps.resize (2);
+    temps[0].clear ();
+    temps[1].clear ();
+    bus_names.resize (2);
+    bus_names[0] = "CPU";
+    bus_names[1] = "GPU";
+    // each bus may have more than one chip
     for (auto chip : s.get_isa_chips ())
-    {
-        // append CPU temps
-        temps.push_back (s.get_temperatures (chip));
-        bus_names.push_back ("CPU");
-    }
+        // each chip may have more than one processor
+        temps[0].push_back (s.get_temperatures (chip));
+    // each bus may have more than one chip
     for (auto chip : s.get_pci_chips ())
-    {
-        // append GPU temps
-        temps.push_back (s.get_temperatures (chip));
-        bus_names.push_back ("GPU");
-    }
+        // each chip may have more than one processor
+        temps[1].push_back (s.get_temperatures (chip));
 }
 
 /// @brief helper
@@ -392,7 +405,7 @@ int main (int argc, char *argv[])
         while (!ui.is_done ())
         {
             // get temperature data
-            vector<vector<temperature>> temps;
+            vector<vector<vector<temperature>>> temps;
             vector<string> bus_names;
             get_temps (s, temps, bus_names);
             // show it

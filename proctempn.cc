@@ -171,7 +171,26 @@ class user_interface
             text ({}, row++, 0, names[i].c_str ());
             for (size_t n = 0; n < temps[i].size (); ++n)
             {
-                temp_bar (n, row++, 0, temps[i][n]);
+                temperature t = temps[i][n];
+                // print the cpu number
+                if (debug && n == 0)
+                    t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
+                stringstream ss;
+                ss << n;
+                text ({}, row, 0, ss.str ().c_str ());
+                // print the numerical value
+                ss.str ("");
+                ss << int (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
+                int color = GREEN;
+                if (t.current >= t.high)
+                    color = YELLOW;
+                if (t.current >= t.critical)
+                    color = RED;
+                text ({A_BOLD, color}, row, 3, "%4s", ss.str ().c_str ());
+                // print the bar
+                const int left = 8;
+                const int size = cols / 2 - left - 5;
+                temp_bar (n, row++, left, size, t);
             }
         }
     }
@@ -182,46 +201,30 @@ class user_interface
     /// @param n cpu number
     /// @param i row
     /// @param j col
+    /// @param size bar length
     /// @param t temperature
     template<typename T>
-    void temp_bar (size_t n, int i, int j, T t) const
+    void temp_bar (size_t n, int i, int j, int size, T t) const
     {
-        if (debug && n == 0)
-            t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
-        stringstream ss;
-        ss << n;
-        text ({}, i, 0, ss.str ().c_str ());
-        const int LEFT = 8;
-        const int RIGHT = 5;
-        const int SIZE = cols / 2 - LEFT - RIGHT;
-        text ({A_BOLD}, i, j + LEFT , "[");
-        text ({A_BOLD}, i, j + LEFT + SIZE + 1, "]");
-        ss.str ("");
-        ss << int (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
+        text ({A_BOLD}, i, j, "[");
+        text ({A_BOLD}, i, j + size - 1, "]");
         const int MIN = 40;
         const int MAX = t.critical + 5;
         int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
-        int len = SIZE * (current - MIN) / (MAX - MIN);
-        int color = GREEN;
-        if (t.current >= t.high)
-            color = YELLOW;
-        if (t.current >= t.critical)
-            color = RED;
-        // print the numerical value
-        text ({A_BOLD, color}, i, 3, ss.str ().c_str ());
-        for (int k = 0; k < SIZE; ++k)
+        int len = size * (current - MIN) / (MAX - MIN);
+        for (int k = 1; k + 1 < size; ++k)
         {
             int color;
-            if (k < SIZE * (t.high - MIN) / (MAX - MIN))
+            if (k < size * (t.high - MIN) / (MAX - MIN))
                 color = GREEN;
-            else if (k < SIZE * (t.critical - MIN) / (MAX - MIN))
+            else if (k < size * (t.critical - MIN) / (MAX - MIN))
                 color = YELLOW;
             else
                 color = RED;
             if (k < len)
-                text ({A_BOLD, A_REVERSE, color}, i, j + LEFT + 1 + k, " ");
+                text ({A_BOLD, A_REVERSE, color}, i, j + k, " ");
             else
-                text ({A_BOLD, color}, i, j + LEFT + 1 + k, "-");
+                text ({A_BOLD, color}, i, j + k, "-");
         }
     }
     /// @brief draw normal style text
@@ -249,10 +252,10 @@ class user_interface
         ss << "proctemp version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
         text ({}, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
-        ss << "T = toggle temperature scale";
+        ss << "T = change Temperature scale";
         text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
         ss.str ("");
-        ss << "Q = quit";
+        ss << "Q = Quit";
         text ({A_BOLD}, row++, cols / 2, ss.str ().c_str ());
         if (debug)
         {
@@ -289,13 +292,13 @@ void get_temps (const S &s, T &temps, U &bus_names)
     {
         // append CPU temps
         temps.push_back (s.get_temperatures (chip));
-        bus_names.push_back ("CPUs");
+        bus_names.push_back ("CPU");
     }
     for (auto chip : s.get_pci_chips ())
     {
         // append GPU temps
         temps.push_back (s.get_temperatures (chip));
-        bus_names.push_back ("GPUs");
+        bus_names.push_back ("GPU");
     }
 }
 

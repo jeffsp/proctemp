@@ -68,7 +68,7 @@ class options
                 throw runtime_error ("warning: error parsing revision number");
             clog << "parsing proctemp configure file with revision number " << major << "." << minor << endl;
             if (major != MAJOR_REVISION)
-                throw runtime_error ("warning: configuration file major revision is not the same this programs's major revision number");
+                throw runtime_error ("warning: configuration file major revision is not the same as this programs's major revision number");
             if (minor > MINOR_REVISION)
                 throw runtime_error ("warning: configuration file revision number is newer than this program's revision number");
             bool value;

@@ -215,7 +215,7 @@ class user_interface
                 // don't print on last line
                 if (row + 1 == rows)
                     continue;
-                text ({}, row++, 0, "%s(%d)", names[bus].c_str (), i);
+                text ({}, row++, 0, "%s%d", names[bus].c_str (), i);
                 for (size_t n = 0; n < temps[bus][i].size (); ++n)
                 {
                     // don't print on last line

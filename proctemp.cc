@@ -5,6 +5,7 @@
 /// @date 2011-03-14
 
 #include "proctemp.h"
+#include <cmath>
 #include <getopt.h>
 
 using namespace std;
@@ -23,7 +24,7 @@ int check (const T &s, const U &chips, bool fahrenheit)
             double t = fahrenheit ? ctof (temp.current) : temp.current;
             double h = fahrenheit ? ctof (temp.high) : temp.high;
             double c = fahrenheit ? ctof (temp.critical) : temp.critical;
-            clog << ' ' << t;
+            clog << ' ' << round (t);
             if (t > c)
             {
                 status = max (status, 2);

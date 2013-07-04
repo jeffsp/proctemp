@@ -5,7 +5,6 @@
 # @date 2013-05-01
 
 waf:
-	waf configure
 	waf
 
 run: waf

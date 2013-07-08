@@ -9,6 +9,7 @@
 
 #include "proctemp.h"
 #include <fstream>
+#include <string>
 #include <sys/stat.h>
 
 namespace proctemp
@@ -24,11 +25,14 @@ class options
     bool dirty;
     /// @brief temperature scale
     bool fahrenheit;
+    /// @brief html filename
+    string html_filename;
     public:
     /// @brief constructor
     options ()
         : dirty (false)
         , fahrenheit (true)
+        , html_filename ("/var/www/proctemp.html")
     {
     }
     /// @brief return true if options have changed
@@ -49,11 +53,25 @@ class options
         dirty = true;
         fahrenheit = f;
     }
+    /// @brief option access
+    string get_html_filename () const
+    {
+        return html_filename;
+    }
+    /// @brief option access
+    void set_html_filename (const string &s)
+    {
+        if (s == html_filename)
+            return;
+        dirty = true;
+        html_filename = s;
+    }
     /// @brief i/o helper
     friend ostream& operator<< (ostream &s, const options &opts)
     {
         s << "proctemp " << MAJOR_REVISION << ' ' << MINOR_REVISION << endl;
         s << "fahrenheit " << opts.fahrenheit << endl;
+        s << "html_filename " << opts.html_filename << endl;
         return s;
     }
     /// @brief i/o helper
@@ -61,6 +79,7 @@ class options
     {
         try
         {
+            // get version information
             string name;
             int major, minor;
             s >> name >> major >> minor;
@@ -72,12 +91,20 @@ class options
                 throw runtime_error ("warning: configuration file major revision is not the same as this programs's major revision number");
             if (minor > MINOR_REVISION)
                 throw runtime_error ("warning: configuration file revision number is newer than this program's revision number");
+            // get fahrenheit option
             bool value;
             s >> name >> value;
             clog << name << ' ' << value << endl;
             if (name != "fahrenheit")
                 throw runtime_error ("warning: error parsing fahrenheit option");
             opts.set_fahrenheit (value);
+            // get html_filename option
+            string fn;
+            s >> name >> fn;
+            clog << name << ' ' << fn << endl;
+            if (name != "html_filename")
+                throw runtime_error ("warning: error parsing html_filename option");
+            opts.set_html_filename (fn);
             // if it was read correctly, it won't need to get written back out
             opts.dirty = false;
         }

@@ -88,6 +88,7 @@ int main (int argc, char *argv[])
 
         // run the main loop
         main_loop<ncurses_ui> (s, opts);
+        //main_loop<html_ui> (s, opts);
 
         // save options if any were changed
         if (opts.is_dirty ())

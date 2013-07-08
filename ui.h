@@ -7,6 +7,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "options.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -18,8 +19,8 @@ namespace proctemp
 
 using namespace std;
 
-/// @brief ncurses user_interface
-class user_interface
+/// @brief ncurses user interface
+class ncurses_ui
 {
     private:
     /// @brief screen dimensions
@@ -37,7 +38,7 @@ class user_interface
     static const int BLUE = COLOR_PAIR(5);
     public:
     /// @brief constructor
-    user_interface (options &opts)
+    ncurses_ui (options &opts)
         : opts (opts)
         , done (false)
         , debug (false)
@@ -46,7 +47,7 @@ class user_interface
         labels ();
     }
     /// @brief destructor
-    ~user_interface ()
+    ~ncurses_ui ()
     {
         release ();
     }

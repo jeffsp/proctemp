@@ -73,7 +73,7 @@ Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 Now point your browser to the location of the file that is visible through the web
 server interface.  For example, 'http://servername/~username/proctemp.html'.
 
-![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/html_output_example.png "proctempview html output example")
+![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_html_example.png "proctempview html output example")
 
 proctempalert
 =============

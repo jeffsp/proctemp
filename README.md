@@ -1,5 +1,5 @@
 proctemp
---------
+========
 
 Utilities for reading processor temperature
 
@@ -38,7 +38,7 @@ something similar to this:
 	temp1:        +62.0°C  (high = +100.0°C, crit = +110.0°C)
 
 proctempview
-------------
+============
 
 Graphically show the CPU and GPU temperatures in real time.
 
@@ -50,8 +50,8 @@ intervals.
 
 ![proctempview example image](jeffsp.github.com/proctemp/proctempview_example.png)
 
-proctempview: html output
-------------------------
+html output
+-----------
 
 You may optionally configure proctempview to write the output to an html file
 that displays temperatures using the Google Charts API.  This will allow you to
@@ -76,7 +76,7 @@ Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 	  'http://servername/~username/proctemp.html'.
 
 proctempalert
--------------
+=============
 
 Alert the user if the CPU or GPU temperature is too high.
 

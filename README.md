@@ -1,7 +1,7 @@
 proctemp
 ========
 
-Utilities for reading processor temperature
+Linux processor temperature utilities.
 
 These utilities all require sensors(1).
 

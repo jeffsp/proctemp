@@ -1,0 +1,50 @@
+.TH PROCTEMPALERT 1 "July 2013" Linux "User Manuals"
+.SH NAME
+proctempalert \- alert the user when processor temperature becomes high
+.SH SYNOPSIS
+.B proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-?|--help] [-g|--gpus]
+.SH DESCRIPTION
+Measure the cpu temperatures and run commands if the temperatures are high.
+.P
+You can run this command from your crontab to alert you via email when your processor gets too hot.
+.P
+For example, if you add the following lines to your crontab:
+.P
+.nf
+	# every tens minutes, check if cpu temperature is high
+.nf
+	*/10	*	*	*	*	/usr/local/bin/proctempalert --high_cmd='sensors | mail -s "`hostname` is HIGH" username@email.com' &> /dev/null
+
+.P
+.nf
+	# every two minutes, check if cpu temperature is critical
+.nf
+	*/2	*	*	*	*	/usr/local/bin/proctempalert --critical_cmd='sensors | mail -s "`hostname` is CRITICAL" username@email.com' &> /dev/null
+.P
+you will receive alerts when your processors become too hot.
+
+.SH RETURN
+The program returns the following error codes to the shell.
+.IP 0
+OK
+.IP 1
+Processor is hot
+.IP 2
+Processor is critically hot
+.SH OPTIONS
+.IP "-h ' '|--high_cmd='cmd ...'"
+Run this command if the cpu temperature is high.
+.IP "-c ' '|--critical_cmd='cmd ...'"
+Run this command if the cpu temperature is critical.
+.IP "-d#|--debug=#"
+Use for debugging.  To force the program to behave as though a processor temperature is high, set # equal to
+1.  Set # equal to 2 to force it to behave as though a processor temperature is critical.
+.P
+This can be useful when you
+are configuring proctempalert to run in your crontab.
+.SH AUTHOR
+Jeff Perry <jeffsp@gmail.com>
+.SH "SEE ALSO"
+.BR proctempview(1)
+.BR crontab(1)
+.BR crontab(5)

@@ -7,7 +7,20 @@
 waf:
 	waf build -j 16
 
-run: waf
+man:
+	man -l proctempalert.1
+	man -l proctempview.1
+
+clean:
+	waf clean
+
+install: waf
+	sudo ~/bin/waf install
+
+uninstall:
+	sudo ~/bin/waf uninstall
+
+check: waf
 	./build/debug/proctempview
 	./build/debug/proctempalert
 	./build/debug/proctempalert -f
@@ -19,4 +32,4 @@ run: waf
 	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
 	-./build/debug/proctempalert -d 2 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
 	-./build/debug/proctempalert -d 2 --critical_cmd='asdf'
-	-./build/debug/proctempalert -d 2 --critical_cmd='./build/debug/proctempdump -f | mail -s "`hostname` is CRITICAL" jeffsp@gmail.com'
+	-./build/debug/proctempalert -d 2 --critical_cmd='sensors | mail -s "`hostname` is CRITICAL" jeffsp@gmail.com'

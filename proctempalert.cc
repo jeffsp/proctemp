@@ -11,22 +11,19 @@
 using namespace std;
 using namespace proctemp;
 
-const string usage = "usage: proctempalert [-h ''|--high_cmd='...'] [-c ''|--critical_cmd='...'] [-d#|--debug=#] [-?|--help] [-f|--fahrenheit] [-g|--gpus]";
+const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-?|--help] [-g|--gpus]";
 
 template<typename T,typename U>
-int check (const T &s, const U &chips, bool fahrenheit)
+int check (const T &s, const U &chips)
 {
     int status = 0;
     for (auto chip : chips)
     {
         for (auto temp : s.get_temperatures (chip))
         {
-            double t = fahrenheit ? ctof (temp.current) : temp.current;
-            double h = fahrenheit ? ctof (temp.high) : temp.high;
-            double c = fahrenheit ? ctof (temp.critical) : temp.critical;
-            if (t > c)
+            if (temp.current > temp.critical)
                 status = max (status, 2);
-            else if (t > h)
+            else if (temp.current > temp.high)
                 status = max (status, 1);
         }
     }
@@ -45,7 +42,6 @@ int main (int argc, char **argv)
     try
     {
         // parse the options
-        bool fahrenheit = false;
         bool gpus = false;
         int debug = 0;
         string high_cmd;
@@ -53,7 +49,6 @@ int main (int argc, char **argv)
         static struct option options[] =
         {
             {"help", 0, 0, '?'},
-            {"fahrenheit", 0, 0, 'f'},
             {"gpus", 0, 0, 'g'},
             {"debug", 1, 0, 'd'},
             {"high_cmd", 1, 0, 'h'},
@@ -62,16 +57,13 @@ int main (int argc, char **argv)
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "?fgd:h:c:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "?gd:h:c:", options, &option_index)) != -1)
         {
             switch (arg)
             {
                 case '?':
                 clog << usage << endl;
                 return 0;
-                case 'f':
-                fahrenheit = true;
-                break;
                 case 'g':
                 gpus = true;
                 break;
@@ -91,7 +83,6 @@ int main (int argc, char **argv)
         clog << "proctemp version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
 
         // print the options
-        clog << "fahrenheit " << fahrenheit << endl;
         clog << "gpus " << gpus << endl;
         clog << "debug " << debug << endl;
         clog << "high_cmd " << high_cmd << endl;
@@ -111,8 +102,8 @@ int main (int argc, char **argv)
 
             clog << "checking " << (gpus ? "GPUs" : "CPUs") <<  endl;
             status = gpus ?
-                check (s, s.get_pci_chips (), fahrenheit) :
-                check (s, s.get_isa_chips (), fahrenheit);
+                check (s, s.get_pci_chips ()) :
+                check (s, s.get_isa_chips ());
         }
 
         switch (status)

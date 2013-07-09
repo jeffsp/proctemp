@@ -48,12 +48,16 @@ htop(1), this will allow you to check temperatures in a console.
 Simply run the program and it will display the temperatures at one second
 intervals.
 
+![proctempview example image](jeffsp.github.com/proctemp/proctempview_example.png)
+
 proctempview: html output
 ------------------------
 
 You may optionally configure proctempview to write the output to an html file
 that displays temperatures using the Google Charts API.  This will allow you to
 view the temperatures through a browser.
+
+![proctempview html output example image](jeffsp.github.com/proctemp/html_output_example.png)
 
 To use this feature, you have to know what you are doing.  This feature is not
 useful unless you have a web server running on your system.

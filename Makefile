@@ -5,7 +5,7 @@
 # @date 2013-05-01
 
 waf:
-	waf
+	waf build -j 16
 
 run: waf
 	./build/debug/proctempview

@@ -209,7 +209,7 @@ class ncurses_ui
                         color = RED;
                     text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
                     // print the bar
-                    const int size = cols / 2 - indent2 - 5;
+                    const int size = 2 * cols / 3 - indent2 - 5;
                     temp_bar (n, row++, indent2, size, t);
                 }
             }
@@ -252,35 +252,36 @@ class ncurses_ui
     void labels () const
     {
         int row = 0;
+        const int COL = 2 * cols / 3;
         stringstream ss;
         ss.str ("");
         ss << "proctemp version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
         text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
         ss << "T = change Temperature scale";
-        text ({}, row++, cols / 2, ss.str ().c_str ());
+        text ({}, row++, COL, ss.str ().c_str ());
         ss.str ("");
         ss << "S = Save configuration options";
-        text ({}, row++, cols / 2, ss.str ().c_str ());
+        text ({}, row++, COL, ss.str ().c_str ());
         ss.str ("");
         ss << "Q = Quit";
-        text ({}, row++, cols / 2, ss.str ().c_str ());
+        text ({}, row++, COL, ss.str ().c_str ());
         if (debug)
         {
             ++row;
             ss.str ("");
             ss << "ncurses version " << NCURSES_VERSION_MAJOR << '.' << NCURSES_VERSION_MINOR;
-            text ({}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, COL, ss.str ().c_str ());
             ss.str ("");
             ss << "terminal dimensions " << rows << " X " << cols;
-            text ({}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, COL, ss.str ().c_str ());
             ++row;
             ss.str ("");
             ss << "YOU ARE IN DEBUG MODE.";
-            text ({}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, COL, ss.str ().c_str ());
             ss.str ("");
             ss << "PRESS '!' TO TURN OFF DEBUG MODE.";
-            text ({}, row++, cols / 2, ss.str ().c_str ());
+            text ({}, row++, COL, ss.str ().c_str ());
         }
     }
 };

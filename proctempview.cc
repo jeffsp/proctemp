@@ -39,7 +39,7 @@ void get_temps (const S &s, T &temps, U &bus_names)
 }
 
 template<typename U,typename S,typename T>
-void main_loop (const S &s, T &opts)
+void main_loop (const S &s, T &opts, const string &config_fn)
 {
     U ui (opts);
     while (!ui.is_done ())
@@ -51,7 +51,7 @@ void main_loop (const S &s, T &opts)
         // show it
         ui.show_temps (temps, bus_names);
         // interpret user input
-        ui.process (getch ());
+        ui.process (getch (), config_fn);
     }
     // close down window
     ui.release ();
@@ -65,7 +65,7 @@ int main (int argc, char *argv[])
         sensors s;
 
         // options get saved here
-        string config_fn = get_config_filename ();
+        string config_fn = get_config_dir () + "/proctempviewrc";
 
         // configurable options
         options opts;
@@ -87,12 +87,7 @@ int main (int argc, char *argv[])
         }
 
         // run the main loop
-        main_loop<ncurses_ui> (s, opts);
-        //main_loop<html_ui> (s, opts);
-
-        // save options if any were changed
-        if (opts.is_dirty ())
-            write (opts, config_fn);
+        main_loop<ncurses_ui> (s, opts, config_fn);
 
         return 0;
     }

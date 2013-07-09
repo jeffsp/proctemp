@@ -57,8 +57,6 @@ You may optionally configure proctempview to write the output to an html file
 that displays temperatures using the Google Charts API.  This will allow you to
 view the temperatures through a browser.
 
-![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/html_output_example.png "proctempview html output example")
-
 To use this feature, you have to know what you are doing.  This feature is not
 useful unless you have a web server running on your system.
 
@@ -71,9 +69,11 @@ Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 	  spaces in the filename.
 	- Run proctempview.  If it can't write to the html file, the program will
 	  report an error and exit.
-	- Point your browser to the location of the file that is visible through the
-	  web server interface.  For example,
-	  'http://servername/~username/proctemp.html'.
+
+Now point your browser to the location of the file that is visible through the web
+server interface.  For example, 'http://servername/~username/proctemp.html'.
+
+![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/html_output_example.png "proctempview html output example")
 
 proctempalert
 =============

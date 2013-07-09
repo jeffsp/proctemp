@@ -1,8 +1,8 @@
-/// @file proctemp.cc
-/// @brief get proc temperature
+/// @file proctempdump.cc
+/// @brief dump processor temperatures to the console
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @version 0.1
-/// @date 2011-03-14
+/// @date 2013-07-09
 
 #include "proctemp.h"
 #include <cmath>
@@ -11,12 +11,11 @@
 using namespace std;
 using namespace proctemp;
 
-const string usage = "usage: proctemp [-h|--help] [-f|--fahrenheit] [-g|--gpus]";
+const string usage = "usage: proctempdump [-?|--help] [-f|--fahrenheit]";
 
 template<typename T,typename U>
-int check (const T &s, const U &chips, bool fahrenheit)
+void dump (const T &s, const U &chips, bool fahrenheit)
 {
-    int status = 0;
     for (auto chip : chips)
     {
         for (auto temp : s.get_temperatures (chip))
@@ -24,22 +23,16 @@ int check (const T &s, const U &chips, bool fahrenheit)
             double t = fahrenheit ? ctof (temp.current) : temp.current;
             double h = fahrenheit ? ctof (temp.high) : temp.high;
             double c = fahrenheit ? ctof (temp.critical) : temp.critical;
-            clog << ' ' << round (t);
+            cout << ' ' << round (t);
             if (t > c)
-            {
-                status = max (status, 2);
-                clog << ">" << c << "!!!";
-            }
+                cout << ">" << c << "!!!";
             else if (t > h)
-            {
-                status = max (status, 1);
-                clog << ">" << h;
-            }
+                cout << ">" << h;
         }
-        clog << endl;
+        cout << endl;
     }
-    return status;
 }
+
 
 int main (int argc, char **argv)
 {
@@ -47,45 +40,40 @@ int main (int argc, char **argv)
     {
         // parse the options
         bool fahrenheit = false;
-        bool gpus = false;
         static struct option options[] =
         {
-            {"help", 0, 0, 'h'},
+            {"help", 0, 0, '?'},
             {"fahrenheit", 0, 0, 'f'},
-            {"gpus", 0, 0, 'g'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "hfgd:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "?f", options, &option_index)) != -1)
         {
             switch (arg)
             {
-                case 'h':
+                case '?':
                 clog << usage << endl;
                 return 0;
                 case 'f':
                 fahrenheit = true;
                 break;
-                case 'g':
-                gpus = true;
-                break;
             }
         };
-        // print the options
-        clog << "fahrenheit " << fahrenheit << endl;
-        clog << "gpus " << gpus << endl;
+
+        // print version info
+        cout << "proctemp version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
 
         // init the sensors library
         sensors s;
-        clog << "libsensors version " << s.get_version () << endl;
+        cout << "libsensors version " << s.get_version () << endl;
 
-        clog << "checking " << (gpus ? "GPUs" : "CPUs") <<  endl;
-        int status = gpus ?
-            check (s, s.get_pci_chips (), fahrenheit) :
-            check (s, s.get_isa_chips (), fahrenheit);
+        cout << "CPUs" << endl;
+        dump (s, s.get_isa_chips (), fahrenheit);
+        cout << "GPUs" << endl;
+        dump (s, s.get_pci_chips (), fahrenheit);
 
-        return status;
+        return 0;
     }
     catch (const exception &e)
     {

@@ -9,7 +9,14 @@ waf:
 
 run: waf
 	./build/debug/proctempview
-	./build/debug/proctemp
-	./build/debug/proctemp -f
-	./build/debug/proctemp -g
-	./build/debug/proctemp -f -g
+	./build/debug/proctempalert
+	./build/debug/proctempalert -f
+	./build/debug/proctempalert -g
+	./build/debug/proctempalert -f -g
+	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH'
+	-./build/debug/proctempalert -d 2 --critical_cmd='echo CRITICAL'
+	-./build/debug/proctempalert -d 0 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
+	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
+	-./build/debug/proctempalert -d 2 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
+	-./build/debug/proctempalert -d 2 --critical_cmd='asdf'
+	-./build/debug/proctempalert -d 2 --critical_cmd='./build/debug/proctempdump -f | mail -s "`hostname` is CRITICAL" jeffsp@gmail.com'

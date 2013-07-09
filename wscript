@@ -57,5 +57,6 @@ def build(ctx):
             waflib.Options.commands.insert(0, ctx.cmd+'_'+x)
     else:
         # the executable name is the filename without the extension
-        ctx.program(source='proctemp.cc',target='proctemp',includes=INCLUDES,lib=LIBS)
+        ctx.program(source='proctempdump.cc',target='proctempdump',includes=INCLUDES,lib=LIBS)
+        ctx.program(source='proctempalert.cc',target='proctempalert',includes=INCLUDES,lib=LIBS)
         ctx.program(source='proctempview.cc',target='proctempview',includes=INCLUDES,lib=LIBS+['ncurses'])

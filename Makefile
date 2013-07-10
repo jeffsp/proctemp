@@ -15,17 +15,15 @@ clean:
 	waf clean
 
 install: waf
-	sudo ~/bin/waf install
+	sudo ~/bin/waf install_release
 
 uninstall:
-	sudo ~/bin/waf uninstall
+	sudo ~/bin/waf uninstall_release
 
 check: waf
 	./build/debug/proctempview
 	./build/debug/proctempalert
-	./build/debug/proctempalert -f
 	./build/debug/proctempalert -g
-	./build/debug/proctempalert -f -g
 	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH'
 	-./build/debug/proctempalert -d 2 --critical_cmd='echo CRITICAL'
 	-./build/debug/proctempalert -d 0 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'

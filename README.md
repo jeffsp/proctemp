@@ -55,7 +55,8 @@ html output
 
 You may optionally configure proctempview to write the output to an html file
 that displays temperatures using the Google Charts API.  This will allow you to
-view the temperatures through a browser.
+view the temperatures through a browser.  The charts will automatically refresh
+themselves every few seconds.
 
 To use this feature, you have to know what you are doing.  This feature is not
 useful unless you have a web server running on your system.

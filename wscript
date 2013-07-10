@@ -26,13 +26,11 @@ def configure(ctx):
     ctx.load('compiler_cxx')
     ctx.env.CXXFLAGS=DEBUG_CXXFLAGS
     ctx.env.SOURCES=glob.glob(SOURCES)
-    ctx.check_cfg(package='gtk+-3.0',args=['--cflags','--libs'])
 
     ctx.setenv('release')
     ctx.load('compiler_cxx')
     ctx.env.CXXFLAGS=RELEASE_CXXFLAGS
     ctx.env.SOURCES=glob.glob(SOURCES)
-    ctx.check_cfg(package='gtk+-3.0',args=['--cflags','--libs'])
 
 def options(opt):
 
@@ -59,3 +57,6 @@ def build(ctx):
         # the executable name is the filename without the extension
         ctx.program(source='proctempalert.cc',target='proctempalert',includes=INCLUDES,lib=LIBS)
         ctx.program(source='proctempview.cc',target='proctempview',includes=INCLUDES,lib=LIBS+['ncurses'])
+
+    # install man pages
+    ctx.install_files('${PREFIX}/man/man1', ['proctempalert.1', 'proctempview.1'])

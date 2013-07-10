@@ -48,20 +48,22 @@ int main (int argc, char **argv)
         string critical_cmd;
         static struct option options[] =
         {
-            {"help", 0, 0, '?'},
+            {"help", 0, 0, 'h'},
             {"gpus", 0, 0, 'g'},
             {"debug", 1, 0, 'd'},
-            {"high_cmd", 1, 0, 'h'},
+            {"high_cmd", 1, 0, 'i'},
             {"critical_cmd", 1, 0, 'c'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "?gd:h:c:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "hgd:i:c:", options, &option_index)) != -1)
         {
             switch (arg)
             {
-                case '?':
+                default:
+                    throw runtime_error ("unknown option specified");
+                case 'h':
                 clog << usage << endl;
                 return 0;
                 case 'g':
@@ -70,7 +72,7 @@ int main (int argc, char **argv)
                 case 'd':
                 debug = atoi (optarg);
                 break;
-                case 'h':
+                case 'i':
                 high_cmd = string (optarg);
                 break;
                 case 'c':

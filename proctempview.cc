@@ -20,7 +20,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ui.h"
-#include <cassert>
 
 using namespace std;
 using namespace proctemp;

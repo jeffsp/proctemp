@@ -1,33 +1,27 @@
-# @file Makefile
-# @brief proctemp makefile
-# @author Jeff Perry <jeffsp@gmail.com>
-# @version 1.0
-# @date 2013-05-01
+CXXFLAGS=-Wall -O2 -std=c++0x -DNDEBUG
 
-waf:
-	waf build -j 16
+all: proctempalert proctempview
 
-man:
-	man -l ./proctempalert.1
-	man -l ./proctempview.1
+proctempalert: proctempalert.cc proctemp.h
+	g++ $(CXXFLAGS) -o $@ $@.cc -lsensors
+
+proctempview: proctempview.cc *.h
+	g++ $(CXXFLAGS) -o $@ $@.cc -lsensors -lncurses
 
 clean:
-	waf clean
+	rm -f proctempalert proctempview
 
-install: waf
-	sudo ~/bin/waf install_release
+debug: CXXFLAGS=-Wall -std=c++0x -g
+debug: clean all
+
+install: clean all
+	install --strip proctempalert /usr/local/bin
+	install --strip proctempview /usr/local/bin
+	install proctempalert.1 /usr/local/man/man1
+	install proctempview.1 /usr/local/man/man1
 
 uninstall:
-	sudo ~/bin/waf uninstall_release
-
-check: waf
-	./build/debug/proctempview
-	./build/debug/proctempalert
-	./build/debug/proctempalert -g
-	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH'
-	-./build/debug/proctempalert -d 2 --critical_cmd='echo CRITICAL'
-	-./build/debug/proctempalert -d 0 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
-	-./build/debug/proctempalert -d 1 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
-	-./build/debug/proctempalert -d 2 --high_cmd='echo HIGH' --critical_cmd='echo CRITICAL'
-	-./build/debug/proctempalert -d 2 --critical_cmd='asdf'
-	-./build/debug/proctempalert -d 2 --critical_cmd='sensors | mail -s "`hostname` is CRITICAL" jeffsp@gmail.com'
+	rm -f /usr/local/bin/proctempalert
+	rm -f /usr/local/bin/proctempview
+	rm -f /usr/local/man/man1/proctempalert.1
+	rm -f /usr/local/man/man1/proctempview.1

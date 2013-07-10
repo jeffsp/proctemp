@@ -8,8 +8,8 @@ waf:
 	waf build -j 16
 
 man:
-	man -l proctempalert.1
-	man -l proctempview.1
+	man -l ./proctempalert.1
+	man -l ./proctempview.1
 
 clean:
 	waf clean

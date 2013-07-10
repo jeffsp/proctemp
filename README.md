@@ -3,39 +3,8 @@ proctemp
 
 Linux processor temperature utilities.
 
-These utilities all require sensors(1).
-
-Run the sensors command to ensure that you have it installed.  You should see
-something similar to this:
-
-	user@hostname/~ $ sensors
-	coretemp-isa-0000
-	Adapter: ISA adapter
-	Physical id 0:  +46.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 0:         +42.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 1:         +44.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 2:         +45.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 3:         +42.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 4:         +42.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 5:         +40.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 6:         +44.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 7:         +40.0°C  (high = +82.0°C, crit = +92.0°C)
-
-	coretemp-isa-0001
-	Adapter: ISA adapter
-	Physical id 1:  +50.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 0:         +46.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 1:         +50.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 2:         +48.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 3:         +48.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 4:         +50.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 5:         +48.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 6:         +44.0°C  (high = +82.0°C, crit = +92.0°C)
-	Core 7:         +44.0°C  (high = +82.0°C, crit = +92.0°C)
-
-	nouveau-pci-0500
-	Adapter: PCI adapter
-	temp1:        +62.0°C  (high = +100.0°C, crit = +110.0°C)
+These utilities all require sensors(1).  To compile the utilities, you also must
+have libsensors4-dev and libncurses5-dev installed.
 
 proctempview
 ============

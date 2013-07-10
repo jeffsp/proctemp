@@ -85,7 +85,7 @@ To receive alerts, edit your crontab:
 
 	user@hostname/~ $ crontab -e
 
-It should look something like this:
+It might be empty, or it might look something like this:
 
 	# This file contains tasks to be run by cron.
 	#
@@ -106,10 +106,10 @@ Add the following two lines (replace username@email.com with your email
 address):
 
 	# every tens minutes, check if cpu temperature is high
-	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors | mail -s "`hostname` is HIGH" username@email.com' &> /dev/null
+	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors | mail -s "`hostname` is HOT" username@email.com' &> /dev/null
 
 	# every two minutes, check if cpu temperature is critical
-	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors | mail -s "`hostname` is CRITICAL" username@email.com' &> /dev/null
+	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors | mail -s "`hostname` is CRITICALLY HOT" username@email.com' &> /dev/null
 
 And exit you editor to install the new crontab tab.
 

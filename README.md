@@ -32,13 +32,13 @@ useful unless you have a web server running on your system.
 
 Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 
-	- Don't change the order of the options in this file.
-	- Enable the feature by changing the html_output variable to '1'.
-	- Change the 'html_filename' variable to a filename to which you will have
-	  write access.  For example, '~/public_html/proctemp.html'.  Don't put
-	  spaces in the filename.
-	- Run proctempview.  If it can't write to the html file, the program will
-	  report an error and exit.
+- Don't change the order of the options in this file.
+- Enable the feature by changing the html__output variable to '1'.
+- Change the 'html__filename' variable to a filename to which you will have
+  write access.  For example, '~/public__html/proctemp.html'.  Don't put
+  spaces in the filename.
+- Run proctempview.  If it can't write to the html file, the program will
+  report an error and exit.
 
 Now point your browser to the location of the file that is visible through the web
 server interface.  For example, 'http://servername/~username/proctemp.html'.

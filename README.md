@@ -3,8 +3,12 @@ proctemp
 
 Linux processor temperature utilities.
 
-These utilities all require sensors(1).  To compile the utilities, you also must
-have libsensors4-dev and libncurses5-dev installed.
+This repository contains two applications: one to graphically display the CPU
+temperatures in a console, and one to alert the user when CPU temperatures
+become high.
+
+These utilities all require sensors(1).  To compile the utilities you also must
+have libsensors-dev and libncurses-dev installed.
 
 proctempview
 ============
@@ -12,7 +16,7 @@ proctempview
 Graphically show the CPU and GPU temperatures in real time.
 
 This program will display the temperatures using ncurses.  Similar to top(1) or
-htop(1), this will allow you to check temperatures in a console.
+htop(1), this will allow you to graphically display temperatures in a console.
 
 Simply run the program and it will display the temperatures at one second
 intervals.
@@ -28,7 +32,7 @@ view the temperatures through a browser.  The charts will automatically refresh
 themselves every few seconds.
 
 To use this feature, you have to know what you are doing.  This feature is not
-useful unless you have a web server running on your system.
+useful unless you have a web server installed.
 
 Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 
@@ -75,10 +79,10 @@ Add the following two lines (replace username@email.com with your email
 address):
 
 	# every tens minutes, check if cpu temperature is high
-	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors | mail -s "`hostname` is HOT" username@email.com' &> /dev/null
+	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors -f | mail -s "`hostname` is HOT" username@email.com' &> /dev/null
 
 	# every two minutes, check if cpu temperature is critical
-	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors | mail -s "`hostname` is CRITICALLY HOT" username@email.com' &> /dev/null
+	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors -f | mail -s "`hostname` is CRITICALLY HOT" username@email.com' &> /dev/null
 
 And exit you editor to install the new crontab tab.
 

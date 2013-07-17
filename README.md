@@ -79,10 +79,10 @@ Add the following two lines (replace username@email.com with your email
 address):
 
 	# every tens minutes, check if cpu temperature is high
-	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors -f | mail -s "`hostname` is HOT" username@email.com' &> /dev/null
+	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors -f | mail -s "`hostname` is HOT" username@email.com' > /dev/null 2>&1
 
 	# every two minutes, check if cpu temperature is critical
-	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors -f | mail -s "`hostname` is CRITICALLY HOT" username@email.com' &> /dev/null
+	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors -f | mail -s "`hostname` is CRITICALLY HOT" username@email.com' > /dev/null 2>&1
 
 And exit you editor to install the new crontab tab.
 
@@ -90,5 +90,4 @@ If you want to make sure you have it setup correctly, change the first
 '--debug=0' with '--debug=1' and the second '--debug=0' with '--debug=2'.  If
 you have it setup correctly, you should start receiving email alerts every 10
 minutes that your CPU or GPU temperature is too high and every 2 minutes that
-your CPU or GPU temperature is critical.  When you are convinced it is setup
-correctly, change the debug's back to 0's or you will get tons of emails.
+your CPU or GPU temperature is critical.

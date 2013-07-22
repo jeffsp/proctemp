@@ -53,11 +53,11 @@ struct option
     template<typename S>
     void parse (S &s)
     {
-        clog << "parsing " << name << " option" << endl;
+        //clog << "parsing " << name << " option" << endl;
         string tmp_name;
         T tmp_value;
         s >> tmp_name >> tmp_value;
-        clog << tmp_name << ' ' << tmp_value << endl;
+        //clog << tmp_name << ' ' << tmp_value << endl;
         if (name != tmp_name)
             throw runtime_error ("warning: didn't get expected option");
         value = tmp_value;

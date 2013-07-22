@@ -1,2 +1,3 @@
-$!/bin/sh
-autoreconf --install || exit 1
+#!/bin/bash
+echo "Regenerating autotools files"
+autoreconf --install

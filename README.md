@@ -1,5 +1,4 @@
-proctemp
-========
+#proctemp
 
 Linux processor temperature utilities.
 
@@ -10,29 +9,32 @@ become high.
 These utilities all require sensors(1).  To compile the utilities you also must
 have libsensors-dev and libncurses-dev installed.
 
-proctempview
-============
+##Installation
+
+	$ ./autogen.sh && ./configure && make
+	...
+	$ sudo make install
+
+##proctempview
 
 Graphically show the CPU and GPU temperatures in real time.
 
 This program will display the temperatures using ncurses.  Similar to top(1) or
 htop(1), this will allow you to graphically display temperatures in a console.
 
-Simply run the program and it will display the temperatures at one second
-intervals.
+###Usage
 
+	user@hostname/~ $ proctempview
+
+###Screenshot
 ![proctempview example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_example.png "proctempview example")
 
-html output
------------
+###HTML output
 
 You may optionally configure proctempview to write the output to an html file
 that displays temperatures using the Google Charts API.  This will allow you to
 view the temperatures through a browser.  The charts will automatically refresh
 themselves every few seconds.
-
-To use this feature, you have to know what you are doing.  This feature is not
-useful unless you have a web server installed.
 
 Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 
@@ -49,10 +51,11 @@ server interface.  For example, 'http://servername/~username/proctemp.html'.
 
 ![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_html_example.png "proctempview html output example")
 
-proctempalert
-=============
+##proctempalert
 
-Alert the user if the CPU or GPU temperature is too high.
+Alert the user via email if the CPU or GPU temperature is too high.
+
+###Usage
 
 To receive alerts, edit your crontab:
 

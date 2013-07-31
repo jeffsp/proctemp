@@ -62,6 +62,10 @@ that displays temperatures using the Google Charts API.  This will allow you to
 view the temperatures through a browser.  The charts will automatically refresh
 themselves every few seconds.
 
+Here is an example:
+
+![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_html_example.png "proctempview html output example")
+
 Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
 
 - Don't change the order of the options in this file.
@@ -73,7 +77,4 @@ Configuration is achieved by editing the ~/.config/proctemp/proctempviewrc file.
   report an error and exit.
 
 Now point your browser to the location of the file that is visible through the web
-server interface.  For example, 'http://servername/~username/proctemp.html'.  The output will look similar to this:
-
-![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_html_example.png "proctempview html output example")
-
+server interface.  For example, 'http://servername/~username/proctemp.html'.

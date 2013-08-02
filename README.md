@@ -52,27 +52,3 @@ If you want to make sure you have it setup correctly, change the first
 you have it setup correctly, you should start receiving email alerts every 10
 minutes that your CPU or GPU temperature is too high and every 2 minutes that
 your CPU or GPU temperature is critical.
-
-###proctempview HTML output
-
-You may optionally configure proctempview to write the output to an html file
-that displays temperatures using the Google Charts API.  This will allow you to
-view the temperatures through a browser.  The charts will automatically refresh
-themselves every few seconds.
-
-Here is an example:
-
-![proctempview html output example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_html_example.png "proctempview html output example")
-
-To configure HTML output, edit your ~/.config/proctemp/proctempviewrc file.
-
-- Don't change the order of the options in this file.
-- Enable the feature by changing the html\_output variable to '1'.
-- Change the 'html\_filename' variable to a filename to which you will have
-  write access.  For example, '~/public\_html/proctemp.html'.  Don't put
-  spaces in the filename.
-- Run proctempview.  If it can't write to the html file, the program will
-  report an error and exit.
-
-Now point your browser to the location of the file that is visible through the web
-server interface.  For example, 'http://servername/~username/proctemp.html'.

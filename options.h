@@ -1,7 +1,6 @@
 /// @file options.h
 /// @brief configuration options
 /// @author Jeff Perry <jeffsp@gmail.com>
-/// @version 1.0
 /// @date 2013-07-04
 
 // Copyright (C) 2013 Jeffrey S. Perry
@@ -74,18 +73,12 @@ class options
     option<int> minor_revision;
     /// @brief temperature scale
     option<bool> fahrenheit;
-    /// @brief write output to html file
-    option<bool> html_output;
-    /// @brief html filename
-    option<string> html_filename;
     public:
     /// @brief constructor
     options ()
         : major_revision (MAJOR_REVISION, "major_revision")
         , minor_revision (MINOR_REVISION, "minor_revision")
         , fahrenheit (true, "fahrenheit")
-        , html_output (false, "html_output")
-        , html_filename ("/var/www/proctemp.html", "html_filename")
     {
     }
     /// @brief option access
@@ -100,31 +93,12 @@ class options
             return;
         fahrenheit.value = f;
     }
-    /// @brief option access
-    bool get_html_output () const
-    {
-        return html_output.value;
-    }
-    /// @brief option access
-    string get_html_filename () const
-    {
-        return html_filename.value;
-    }
-    /// @brief option access
-    void set_html_filename (const string &s)
-    {
-        if (s == html_filename.value)
-            return;
-        html_filename.value = s;
-    }
     /// @brief i/o helper
     friend ostream& operator<< (ostream &s, const options &opts)
     {
         s << opts.major_revision.name << " " << opts.major_revision.value << endl;
         s << opts.minor_revision.name << " " << opts.minor_revision.value << endl;
         s << opts.fahrenheit.name << " " << opts.fahrenheit.value << endl;
-        s << opts.html_output.name << " " << opts.html_output.value << endl;
-        s << opts.html_filename.name << " " << opts.html_filename.value << endl;
         return s;
     }
     /// @brief i/o helper
@@ -140,8 +114,6 @@ class options
             if (opts.minor_revision.value > MINOR_REVISION)
                 throw runtime_error ("warning: configuration file revision number is newer than this program's revision number");
             opts.fahrenheit.parse (s);
-            opts.html_output.parse (s);
-            opts.html_filename.parse (s);
         }
         catch (const exception &e)
         {

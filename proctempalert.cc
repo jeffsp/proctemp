@@ -1,7 +1,6 @@
 /// @file proctempalert.cc
 /// @brief get processor temperature and optionally send an alert if it's too high
 /// @author Jeff Perry <jeffsp@gmail.com>
-/// @version 0.1
 /// @date 2013-04-30
 
 // Copyright (C) 2013 Jeffrey S. Perry

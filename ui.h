@@ -1,7 +1,6 @@
 /// @file ui.h
 /// @brief user interface
 /// @author Jeff Perry <jeffsp@gmail.com>
-/// @version 1.0
 /// @date 2013-07-04
 
 // Copyright (C) 2013 Jeffrey S. Perry
@@ -23,8 +22,8 @@
 #define UI_H
 
 #include "options.h"
-#include "html.h"
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <ncurses.h>
 #include <sstream>
@@ -75,14 +74,6 @@ class ncurses_ui
         , done (false)
         , debug (false)
     {
-        if (opts.get_html_output ())
-        {
-            // try to open html file
-            clog << "opening " << opts.get_html_filename () << " for writing" << endl;
-            ofstream ofs (opts.get_html_filename ().c_str ());
-            if (!ofs)
-                throw runtime_error ("error: can't open html output file");
-        }
         init ();
         labels ();
     }
@@ -169,17 +160,6 @@ class ncurses_ui
     void show_temps (const T &temps, const U &names) const
     {
         assert (temps.size () == names.size ());
-        // write output to html if specified
-        if (opts.get_html_output ())
-        {
-            ofstream ofs (opts.get_html_filename ().c_str ());
-            if (!ofs)
-            {
-                clog << "can't open " << opts.get_html_filename () << " for writing" << endl;
-                throw runtime_error ("can't open html output file");
-            }
-            draw_charts (ofs, temps, names, opts.get_fahrenheit ());
-        }
         // get the width of the cpu number column
         size_t max_cpus = 0;
         for (size_t bus = 0; bus < temps.size (); ++bus)
@@ -194,14 +174,14 @@ class ncurses_ui
         const int indent2 = indent1 + 5;
         // print the temperatures
         auto row = 0;
-        for (size_t bus = 0; bus < temps.size (); ++bus)
+        for (size_t bus = 0; bus < names.size (); ++bus)
         {
             for (size_t i = 0; i < temps[bus].size (); ++i)
             {
                 // don't print on last line
                 if (row + 1 == rows)
                     continue;
-                text ({}, row++, 0, "%s%d", names[bus].c_str (), i);
+                text ({}, row++, 0, "%s %d", names[bus].c_str (), i);
                 for (size_t n = 0; n < temps[bus][i].size (); ++n)
                 {
                     // don't print on last line
@@ -217,15 +197,23 @@ class ncurses_ui
                     // print the numerical value
                     ss.str ("");
                     ss << round (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
-                    int color = GREEN;
-                    if (t.current >= t.high)
-                        color = YELLOW;
-                    if (t.current >= t.critical)
-                        color = RED;
-                    text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
-                    // print the bar
-                    const int size = 2 * cols / 3 - indent2 - 5;
-                    temp_bar (n, row++, indent2, size, t);
+                    if (t.high == -1)
+                    {
+                        int color = GREEN;
+                        text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                    }
+                    else
+                    {
+                        int color = GREEN;
+                        if (t.current >= t.high)
+                            color = YELLOW;
+                        if (t.current >= t.critical)
+                            color = RED;
+                        text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                        // print the bar
+                        const int size = 2 * cols / 3 - indent2 - 5;
+                        temp_bar (n, row++, indent2, size, t);
+                    }
                 }
             }
         }
@@ -270,7 +258,7 @@ class ncurses_ui
         const int COL = 2 * cols / 3;
         stringstream ss;
         ss.str ("");
-        ss << "proctemp version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
+        ss << "proctempview version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
         text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
         ss << "T = change Temperature scale";

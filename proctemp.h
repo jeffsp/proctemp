@@ -1,7 +1,6 @@
 /// @file proctemp.h
 /// @brief proctemp
 /// @author Jeff Perry <jeffsp@gmail.com>
-/// @version 1.0
 /// @date 2013-04-30
 
 // Copyright (C) 2013 Jeffrey S. Perry
@@ -35,7 +34,10 @@ using namespace std;
 
 /// @brief version info
 const int MAJOR_REVISION = 0;
-const int MINOR_REVISION = 1;
+const int MINOR_REVISION = 2;
+
+/// @brief sensors definitions
+const int MAX_BUSES = 7;
 
 /// @brief convert from fahrenheit to celsius
 ///
@@ -108,15 +110,17 @@ class sensors
             const sensors_subfeature *input = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_INPUT);
             const sensors_subfeature *max = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_MAX);
             const sensors_subfeature *crit = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_CRIT);
-            temperature t;
-            t.current = get_value (c, input);
-            t.high = get_value (c, max);
-            t.critical = get_value (c, crit);
+            temperature t { -1, -1, -1 };
+            if (input)
+                t.current = get_value (c, input);
+            if (max)
+                t.high = get_value (c, max);
+            if (crit)
+                t.critical = get_value (c, crit);
             temps.push_back (t);
         }
         return temps;
     }
-    private:
     /// @brief get collection of chips of a specific type
     ///
     /// @param type chip type
@@ -130,6 +134,7 @@ class sensors
             c.push_back (name);
         return c;
     }
+    private:
     /// @brief get sensors chip names
     ///
     /// @return collection of chip names
@@ -169,7 +174,7 @@ class sensors
         if ((subfeature = sensors_get_subfeature (name, feature, type)))
             return subfeature;
         else
-            throw runtime_error ("could not get subfeature");
+            return nullptr;
     }
     /// @brief get the value of a subfeature
     ///

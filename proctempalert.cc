@@ -25,20 +25,28 @@
 using namespace std;
 using namespace proctemp;
 
-const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-?|--help] [-g|--gpus]";
+const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-?|--help]";
 
-template<typename T,typename U>
-int check (const T &s, const U &chips)
+int check (const sensors &s)
 {
     int status = 0;
-    for (auto chip : chips)
+    // get temps
+    busses b = scan (s);
+    for (auto bus : b)
     {
-        for (auto temp : s.get_temperatures (chip))
+        for (auto chip : bus.chips)
         {
-            if (temp.current > temp.critical)
-                status = max (status, 2);
-            else if (temp.current > temp.high)
-                status = max (status, 1);
+            for (auto t : chip.temps)
+            {
+                clog << t.current
+                    << " " << t.high
+                    << " " << t.critical
+                    << endl;
+                if (t.critical > 0 && t.current > t.critical)
+                    status = max (status, 2);
+                else if (t.high > 0 && t.current > t.high)
+                    status = max (status, 1);
+            }
         }
     }
     return status;
@@ -56,14 +64,12 @@ int main (int argc, char **argv)
     try
     {
         // parse the options
-        bool gpus = false;
         int debug = 0;
         string high_cmd;
         string critical_cmd;
         static struct option options[] =
         {
             {"help", 0, 0, 'h'},
-            {"gpus", 0, 0, 'g'},
             {"debug", 1, 0, 'd'},
             {"high_cmd", 1, 0, 'i'},
             {"critical_cmd", 1, 0, 'c'},
@@ -71,7 +77,7 @@ int main (int argc, char **argv)
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "hgd:i:c:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "hd:i:c:", options, &option_index)) != -1)
         {
             switch (arg)
             {
@@ -80,9 +86,6 @@ int main (int argc, char **argv)
                 case 'h':
                 clog << usage << endl;
                 return 0;
-                case 'g':
-                gpus = true;
-                break;
                 case 'd':
                 debug = atoi (optarg);
                 break;
@@ -99,7 +102,6 @@ int main (int argc, char **argv)
         clog << "proctemp version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
 
         // print the options
-        clog << "gpus " << gpus << endl;
         clog << "debug " << debug << endl;
         clog << "high_cmd " << high_cmd << endl;
         clog << "critical_cmd " << critical_cmd << endl;
@@ -115,22 +117,22 @@ int main (int argc, char **argv)
             // init the sensors library
             sensors s;
             clog << "libsensors version " << s.get_version () << endl;
-
-            clog << "checking " << (gpus ? "GPUs" : "CPUs") <<  endl;
-            status = gpus ?
-                check (s, s.get_pci_chips ()) :
-                check (s, s.get_isa_chips ());
+            clog << "checking temperatures" <<  endl;
+            status = check (s);
         }
 
         switch (status)
         {
             default:
             case 0:
+            clog << "temperatures are normal" << endl;
             break;
             case 1:
+            clog << "temperatures are high" << endl;
             execute (high_cmd);
             break;
             case 2:
+            clog << "temperatures are critical" << endl;
             execute (critical_cmd);
             break;
         }

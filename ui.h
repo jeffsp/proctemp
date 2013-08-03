@@ -31,8 +31,6 @@
 namespace proctemp
 {
 
-using namespace std;
-
 /// @brief draw ncurses text with attributes
 ///
 /// @param attrs vector of attrs
@@ -41,7 +39,7 @@ using namespace std;
 /// @param s string
 /// @param args print args
 template<typename... T>
-void text (const vector<int> &attrs, int r, int c, const char *s, T... args)
+void text (const std::vector<int> &attrs, int r, int c, const char *s, T... args)
 {
     for (auto a : attrs)
         attron (a);
@@ -114,7 +112,7 @@ class ncurses_ui
         return done;
     }
     /// @brief event loop support
-    void process (int ch, const string &config_fn)
+    void process (int ch, const std::string &config_fn)
     {
         switch (ch)
         {
@@ -152,21 +150,16 @@ class ncurses_ui
     }
     /// @brief display temps
     ///
-    /// @tparam T vector of temps type
-    /// @tparam U vector of names type
-    /// @param temps vector of temps
-    /// @param names vector of names
-    template<typename T,typename U>
-    void show_temps (const T &temps, const U &names) const
+    /// @param busses vector of busses
+    void show_temps (const busses &bs) const
     {
-        assert (temps.size () == names.size ());
         // get the width of the cpu number column
         size_t max_cpus = 0;
-        for (size_t bus = 0; bus < temps.size (); ++bus)
-            for (size_t i = 0; i < temps[bus].size (); ++i)
-                if (temps[bus][i].size () > max_cpus)
-                    max_cpus = temps[bus][i].size ();
-        stringstream ss;
+        for (auto bus : bs)
+            for (auto chip : bus.chips)
+                if (chip.temps.size () > max_cpus)
+                    max_cpus = chip.temps.size ();
+        std::stringstream ss;
         ss << max_cpus;
         // length of largest number plus a space
         const int indent1 = ss.str ().size () + 1;
@@ -174,25 +167,30 @@ class ncurses_ui
         const int indent2 = indent1 + 5;
         // print the temperatures
         auto row = 0;
-        for (size_t bus = 0; bus < names.size (); ++bus)
+        for (auto bus : bs)
         {
-            for (size_t i = 0; i < temps[bus].size (); ++i)
+            text ({}, row++, 0, "%s", bus.name.c_str ());
+            size_t chipno = 0;
+            for (auto chip : bus.chips)
             {
                 // don't print on last line
                 if (row + 1 == rows)
                     continue;
-                text ({}, row++, 0, "%s %d", names[bus].c_str (), i);
-                for (size_t n = 0; n < temps[bus][i].size (); ++n)
+                if (bus.chips.size () > 1)
+                    text ({}, row++, 0, "%s %d", chip.name.c_str (), chipno++);
+                else
+                    text ({}, row++, 0, "%s", chip.name.c_str ());
+                size_t n = 0;
+                for (auto t : chip.temps)
                 {
                     // don't print on last line
                     if (row + 1 == rows)
                         continue;
-                    temperature t = temps[bus][i][n];
-                    // print the cpu number
-                    if (debug && !(rand () % temps[bus][i].size ()))
+                    if (debug && !(rand () % chip.temps.size ()))
                         t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
-                    stringstream ss;
-                    ss << n;
+                    // print the cpu number
+                    std::stringstream ss;
+                    ss << n++;
                     text ({}, row, 0, ss.str ().c_str ());
                     // print the numerical value
                     ss.str ("");
@@ -256,7 +254,7 @@ class ncurses_ui
     {
         int row = 0;
         const int COL = 2 * cols / 3;
-        stringstream ss;
+        std::stringstream ss;
         ss.str ("");
         ss << "proctempview version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
         text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
@@ -285,6 +283,63 @@ class ncurses_ui
             ss.str ("");
             ss << "PRESS '!' TO TURN OFF DEBUG MODE.";
             text ({}, row++, COL, ss.str ().c_str ());
+        }
+    }
+};
+
+/// @brief ncurses user interface
+class debug_ui
+{
+    private:
+    options &opts;
+    int done;
+    public:
+    /// @brief constructor
+    debug_ui (options &opts)
+        : opts (opts)
+        , done (0)
+    {
+        std::clog << "options" << std::endl;
+        std::clog << "fahrenheit:\t" << opts.get_fahrenheit () << std::endl;
+    }
+    /// @brief initialize
+    void init ()
+    {
+    }
+    /// @brief cleanup
+    void release () const
+    {
+    }
+    /// @brief event loop support
+    ///
+    /// @return true if done
+    bool is_done ()
+    {
+        return done++;
+    }
+    /// @brief event loop support
+    void process (int , const std::string &)
+    {
+    }
+    /// @brief display temps
+    ///
+    /// @param busses vector of busses
+    void show_temps (const busses &bs) const
+    {
+        for (auto bus : bs)
+        {
+            std::clog << bus.name << std::endl;
+            for (auto chip : bus.chips)
+            {
+                std::clog << "adapter " << chip.name << std::endl;
+                for (auto t : chip.temps)
+                {
+                    std::clog
+                        << round (opts.get_fahrenheit () ? ctof (t.current) : t.current)
+                        << (opts.get_fahrenheit () ? 'F' : 'C')
+                        << std::endl;
+                }
+            }
         }
     }
 };

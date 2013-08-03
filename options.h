@@ -29,8 +29,6 @@
 namespace proctemp
 {
 
-using namespace std;
-
 /// @brief configuration option
 ///
 /// @tparam T option type
@@ -41,10 +39,10 @@ struct option
     ///
     /// @param value option value
     /// @param name option name
-    option (const T &value, const string &name)
+    option (const T &value, const std::string &name)
         : value (value), name (name) { }
     T value;
-    string name;
+    std::string name;
     /// @brief read an option
     ///
     /// @tparam S stream type
@@ -52,13 +50,13 @@ struct option
     template<typename S>
     void parse (S &s)
     {
-        //clog << "parsing " << name << " option" << endl;
-        string tmp_name;
+        //std::clog << "parsing " << name << " option" << std::endl;
+        std::string tmp_name;
         T tmp_value;
         s >> tmp_name >> tmp_value;
-        //clog << tmp_name << ' ' << tmp_value << endl;
+        //std::clog << tmp_name << ' ' << tmp_value << std::endl;
         if (name != tmp_name)
-            throw runtime_error ("warning: didn't get expected option");
+            throw std::runtime_error ("warning: didn't get expected option");
         value = tmp_value;
     }
 };
@@ -94,15 +92,15 @@ class options
         fahrenheit.value = f;
     }
     /// @brief i/o helper
-    friend ostream& operator<< (ostream &s, const options &opts)
+    friend std::ostream& operator<< (std::ostream &s, const options &opts)
     {
-        s << opts.major_revision.name << " " << opts.major_revision.value << endl;
-        s << opts.minor_revision.name << " " << opts.minor_revision.value << endl;
-        s << opts.fahrenheit.name << " " << opts.fahrenheit.value << endl;
+        s << opts.major_revision.name << " " << opts.major_revision.value << std::endl;
+        s << opts.minor_revision.name << " " << opts.minor_revision.value << std::endl;
+        s << opts.fahrenheit.name << " " << opts.fahrenheit.value << std::endl;
         return s;
     }
     /// @brief i/o helper
-    friend istream& operator>> (istream &s, options &opts)
+    friend std::istream& operator>> (std::istream &s, options &opts)
     {
         try
         {
@@ -110,16 +108,16 @@ class options
             opts.major_revision.parse (s);
             opts.minor_revision.parse (s);
             if (opts.major_revision.value != MAJOR_REVISION)
-                throw runtime_error ("warning: configuration file major revision is not the same as this programs's major revision number");
+                throw std::runtime_error ("warning: configuration file major revision is not the same as this programs's major revision number");
             if (opts.minor_revision.value > MINOR_REVISION)
-                throw runtime_error ("warning: configuration file revision number is newer than this program's revision number");
+                throw std::runtime_error ("warning: configuration file revision number is newer than this program's revision number");
             opts.fahrenheit.parse (s);
         }
-        catch (const exception &e)
+        catch (const std::exception &e)
         {
-            cerr << e.what () << endl;
-            clog << "cannot parse configuration file" << endl;
-            clog << "setting options to their defaults" << endl;
+            std::clog << e.what () << std::endl;
+            std::clog << "cannot parse configuration file" << std::endl;
+            std::clog << "setting options to their defaults" << std::endl;
             // set to default
             opts = options ();
         }
@@ -131,12 +129,12 @@ class options
 ///
 /// @param opts options
 /// @param fn filename
-void read (options &opts, const string &fn)
+void read (options &opts, const std::string &fn)
 {
-    clog << "reading configuration file " << fn << endl;
-    ifstream ifs (fn.c_str ());
+    std::clog << "reading configuration file " << fn << std::endl;
+    std::ifstream ifs (fn.c_str ());
     if (!ifs)
-        throw runtime_error ("could not open config file for reading");
+        throw std::runtime_error ("could not open config file for reading");
     ifs >> opts;
 }
 
@@ -144,36 +142,36 @@ void read (options &opts, const string &fn)
 ///
 /// @param opts options
 /// @param fn filename
-void write (const options &opts, const string &fn)
+void write (const options &opts, const std::string &fn)
 {
-    clog << "writing configuration file " << fn << endl;
-    ofstream ofs (fn.c_str ());
+    std::clog << "writing configuration file " << fn << std::endl;
+    std::ofstream ofs (fn.c_str ());
     if (!ofs)
-        throw runtime_error ("could not open config file for writing");
+        throw std::runtime_error ("could not open config file for writing");
     ofs << opts;
 }
 
 /// @brief get the directory of the configuration file, creating the directory if needed
 ///
 /// @return name of the config directory
-string get_config_dir ()
+std::string get_config_dir ()
 {
-    string config_dir;
+    std::string config_dir;
     if (getenv ("XDG_CONFIG_HOME"))
         config_dir = getenv ("XDG_CONFIG_HOME");
     else if (getenv ("HOME"))
-        config_dir = getenv ("HOME") + string ("/.config");
+        config_dir = getenv ("HOME") + std::string ("/.config");
     else
         config_dir = "~/.config";
     config_dir += "/proctemp";
     struct stat sb;
     if (stat (config_dir.c_str (), &sb) == -1)
     {
-        clog << "creating config file directory " << config_dir << endl;
+        std::clog << "creating config file directory " << config_dir << std::endl;
         mkdir (config_dir.c_str (), 0700);
     }
     if (stat (config_dir.c_str (), &sb) == -1)
-        throw runtime_error ("could not create config file directory");
+        throw std::runtime_error ("could not create config file directory");
     return config_dir;
 };
 

@@ -23,59 +23,16 @@
 using namespace std;
 using namespace proctemp;
 
-/// @brief get sensor data
-///
-/// @tparam S sensors type
-/// @tparam T bus name output type
-/// @param s sensors
-/// @param bus_names bus names output
-template<typename S,typename T>
-void get_bus_names (const S &s, T &bus_names)
-{
-    for (short i = 0; i < bus_names.size (); ++i)
-    {
-        sensors_bus_id id { i, 0 };
-        const char *name = sensors_get_adapter_name (&id);
-        if (name != nullptr)
-            bus_names[i] = name;
-        else
-            bus_names[i] = "Unknown";
-    }
-}
-
-/// @brief get sensor data
-///
-/// @tparam S sensors type
-/// @tparam T temperature output type
-/// @param s sensors
-/// @param temps temperature output
-template<typename S,typename T>
-void get_temps (const S &s, T &temps)
-{
-    for (short i = 0; i < temps.size (); ++i)
-    {
-        auto chips = s.get_chips (i);
-        if (chips.empty ())
-            continue;
-        for (auto c : chips)
-            temps[i].push_back (s.get_temperatures (c));
-    }
-}
-
-template<typename U,typename S,typename T>
-void main_loop (const S &s, T &opts, const string &config_fn)
+template<typename U>
+void main_loop (const sensors &s, options &opts, const string &config_fn)
 {
     U ui (opts);
-    // get labels
-    vector<string> bus_names (MAX_BUSES);
-    get_bus_names (s, bus_names);
     while (!ui.is_done ())
     {
-        // get temperature data
-        vector<vector<vector<temperature>>> temps (MAX_BUSES);
-        get_temps (s, temps);
-        // show it
-        ui.show_temps (temps, bus_names);
+        // get temps
+        busses b = scan (s);
+        // show them
+        ui.show_temps (b);
         // interpret user input
         ui.process (getch (), config_fn);
     }
@@ -114,6 +71,7 @@ int main (int argc, char *argv[])
 
         // run the main loop
         main_loop<ncurses_ui> (s, opts, config_fn);
+        //main_loop<debug_ui> (s, opts, config_fn);
 
         return 0;
     }

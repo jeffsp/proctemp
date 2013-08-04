@@ -33,12 +33,18 @@ namespace proctemp
 /// @brief total number of busses to scan
 const int MAX_BUSSES = SENSORS_BUS_TYPE_HID + 1;
 
-/// @brief temperature reading from a chip
-struct temperature
+/// @brief temperature reading
+struct temperature_feature
 {
     double current;
     double high;
     double critical;
+};
+
+/// @brief fan speed reading
+struct fan_speed_feature
+{
+    double current;
 };
 
 /// @brief wrapper for sensors/sensors.h functionality
@@ -67,14 +73,18 @@ class sensors
     typedef const sensors_chip_name *chip;
     /// @brief collection of chips
     typedef std::vector<chip> chips;
+    /// @brief collection of temperature feature
+    typedef std::vector<temperature_feature> temperature_features;
+    /// @brief collection of temperature feature
+    typedef std::vector<fan_speed_feature> fan_speed_features;
     /// @brief get temperatures for all the cores on a chip
     ///
     /// @param c the chip
     ///
     /// @return collection of core temperatures
-    std::vector<temperature> get_temperatures (chip c) const
+    temperature_features get_temperatures (chip c) const
     {
-        std::vector<temperature> temps;
+        temperature_features temps;
         for (auto feature : get_features (c))
         {
             if (feature->type != SENSORS_FEATURE_TEMP)
@@ -82,7 +92,7 @@ class sensors
             const sensors_subfeature *input = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_INPUT);
             const sensors_subfeature *max = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_MAX);
             const sensors_subfeature *crit = get_subfeature (c, feature, SENSORS_SUBFEATURE_TEMP_CRIT);
-            temperature t { -1, -1, -1 };
+            temperature_feature t { -1, -1, -1 };
             if (input)
                 t.current = get_value (c, input);
             if (max)
@@ -92,6 +102,26 @@ class sensors
             temps.push_back (t);
         }
         return temps;
+    }
+    /// @brief get fan speeds for all the cores on a chip
+    ///
+    /// @param c the chip
+    ///
+    /// @return collection of fan speeds
+    fan_speed_features get_fan_speeds (chip c) const
+    {
+        fan_speed_features fs;
+        for (auto feature : get_features (c))
+        {
+            if (feature->type != SENSORS_FEATURE_FAN)
+                continue;
+            const sensors_subfeature *input = get_subfeature (c, feature, SENSORS_SUBFEATURE_FAN_INPUT);
+            fan_speed_feature f { -1 };
+            if (input)
+                f.current = get_value (c, input);
+            fs.push_back (f);
+        }
+        return fs;
     }
     /// @brief get collection of chips of a specific type
     ///

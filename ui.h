@@ -189,16 +189,19 @@ class ncurses_ui
                     if (debug && !(rand () % chip.temps.size ()))
                         t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
                     // print the cpu number
-                    std::stringstream ss;
-                    ss << n++;
-                    text ({}, row, 0, ss.str ().c_str ());
+                    if (chip.temps.size () > 1)
+                    {
+                        std::stringstream ss;
+                        ss << n++;
+                        text ({}, row, 0, ss.str ().c_str ());
+                    }
                     // print the numerical value
                     ss.str ("");
                     ss << round (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
                     if (t.high == -1)
                     {
                         int color = GREEN;
-                        text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                        text ({A_BOLD, color}, row++, indent1, "%4s", ss.str ().c_str ());
                     }
                     else
                     {
@@ -213,6 +216,16 @@ class ncurses_ui
                         temp_bar (n, row++, indent2, size, t);
                     }
                 }
+                for (auto f : chip.fan_speeds)
+                {
+                    // don't print on last line
+                    if (row + 1 == rows)
+                        continue;
+                    std::stringstream ss;
+                    ss << round (f.current);
+                    text ({A_BOLD, WHITE}, row++, indent1, "FAN %4s RPM", ss.str ().c_str ());
+                }
+                ++row;
             }
         }
     }

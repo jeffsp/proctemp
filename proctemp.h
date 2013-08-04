@@ -44,11 +44,26 @@ double ctof (const double c)
     return c * 9.0 / 5.0 + 32.0;
 }
 
+/// @brief temperature reading
+struct temperature
+{
+    double current;
+    double high;
+    double critical;
+};
+
+/// @brief fan speed reading
+struct fan_speed
+{
+    double current;
+};
+
 /// @brief a chip on a bus with sensor data
 struct chip
 {
     std::string name;
     std::vector<temperature> temps;
+    std::vector<fan_speed> fan_speeds;
 };
 
 /// @brief a bus that may have chips
@@ -89,7 +104,18 @@ busses scan (const sensors &s)
         {
             chip ch;
             ch.name = c->prefix;
-            ch.temps = s.get_temperatures (c);
+            auto temps = s.get_temperatures (c);
+            for (auto t : temps)
+            {
+                temperature temp { t.current, t.high, t.critical };
+                ch.temps.push_back (temp);
+            }
+            auto fss = s.get_fan_speeds (c);
+            for (auto f : fss)
+            {
+                fan_speed fs { f.current };
+                ch.fan_speeds.push_back (fs);
+            }
             b.chips.push_back (ch);
         }
         bs.push_back (b);

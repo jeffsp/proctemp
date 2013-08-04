@@ -55,6 +55,7 @@ struct chip
 struct bus
 {
     std::string name;
+    unsigned id;
     std::vector<chip> chips;
 };
 
@@ -83,6 +84,7 @@ busses scan (const sensors &s)
             b.name = "Unknown";
         else
             b.name = name;
+        b.id = i;
         for (auto c : chips)
         {
             chip ch;

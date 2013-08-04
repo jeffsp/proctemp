@@ -4,4 +4,6 @@ proctempalert_LDADD = -lsensors
 proctempview_SOURCES = proctempview.cc html.h options.h proctemp.h ui.h
 proctempview_LDADD = -lsensors -lncurses
 
-AM_CXXFLAGS = -std=c++0x
+man1_MANS = proctempalert.1 proctempview.1
+
+AM_CXXFLAGS = -std=c++0x -Wall

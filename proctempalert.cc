@@ -25,20 +25,25 @@
 using namespace std;
 using namespace proctemp;
 
-const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-?|--help]";
+const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-b#|--bus_id=#] [-d#|--debug=#] [-?|--help]";
 
-int check (const sensors &s)
+int check (const busses &b, unsigned bus_id)
 {
     int status = 0;
-    // get temps
-    busses b = scan (s);
-    for (auto bus : b)
+    for (size_t i = 0; i < b.size (); ++i)
     {
-        for (auto chip : bus.chips)
+        // skip the bus if specified
+        if (bus_id != ~0u && bus_id != b[i].id)
+            continue;
+        // print bus id
+        clog << "[" << b[i].id << "] " << b[i].name << endl;
+        // print temps
+        for (auto chip : b[i].chips)
         {
             for (auto t : chip.temps)
             {
-                clog << t.current
+                clog
+                    << "    " << t.current
                     << " " << t.high
                     << " " << t.critical
                     << endl;
@@ -67,17 +72,19 @@ int main (int argc, char **argv)
         int debug = 0;
         string high_cmd;
         string critical_cmd;
+        unsigned bus_id = ~0u;
         static struct option options[] =
         {
             {"help", 0, 0, 'h'},
             {"debug", 1, 0, 'd'},
             {"high_cmd", 1, 0, 'i'},
             {"critical_cmd", 1, 0, 'c'},
+            {"bus", 1, 0, 'b'},
             {NULL, 0, NULL, 0}
         };
         int option_index;
         int arg;
-        while ((arg = getopt_long (argc, argv, "hd:i:c:", options, &option_index)) != -1)
+        while ((arg = getopt_long (argc, argv, "hd:i:c:b:", options, &option_index)) != -1)
         {
             switch (arg)
             {
@@ -95,6 +102,9 @@ int main (int argc, char **argv)
                 case 'c':
                 critical_cmd = string (optarg);
                 break;
+                case 'b':
+                bus_id = atoi (optarg);
+                break;
             }
         };
 
@@ -102,9 +112,14 @@ int main (int argc, char **argv)
         clog << "proctemp version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
 
         // print the options
-        clog << "debug " << debug << endl;
-        clog << "high_cmd " << high_cmd << endl;
-        clog << "critical_cmd " << critical_cmd << endl;
+        clog << "debug=" << debug << endl;
+        clog << "high_cmd=\"" << high_cmd << "\"" << endl;
+        clog << "critical_cmd=\"" << critical_cmd << "\"" << endl;
+        clog << "bus_id=" << bus_id << endl;
+
+        // init the sensors library
+        sensors s;
+        busses b = scan (s);
 
         // return code
         int status;
@@ -114,11 +129,9 @@ int main (int argc, char **argv)
             status = debug;
         else
         {
-            // init the sensors library
-            sensors s;
             clog << "libsensors version " << s.get_version () << endl;
             clog << "checking temperatures" <<  endl;
-            status = check (s);
+            status = check (b, bus_id);
         }
 
         switch (status)

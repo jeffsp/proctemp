@@ -165,6 +165,7 @@ class ncurses_ui
         const int indent1 = ss.str ().size () + 1;
         // assumes temps are 3 digits at most, plus the C or F, plus a space
         const int indent2 = indent1 + 5;
+        const int indent3 = indent2 + 7;
         // print the temperatures
         auto row = 0;
         for (auto bus : bs)
@@ -183,39 +184,34 @@ class ncurses_ui
                 size_t n = 0;
                 for (auto t : chip.temps)
                 {
+                    // set default temps if none were given
+                    if (t.high == -1)
+                        t.high = 80;
+                    if (t.critical == -1)
+                        t.critical = 90;
                     // don't print on last line
                     if (row + 1 == rows)
                         continue;
                     if (debug && !(rand () % chip.temps.size ()))
                         t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
                     // print the cpu number
-                    if (chip.temps.size () > 1)
-                    {
-                        std::stringstream ss;
-                        ss << n++;
-                        text ({}, row, 0, ss.str ().c_str ());
-                    }
+                    std::stringstream ss;
+                    ss << n++;
+                    text ({}, row, 0, ss.str ().c_str ());
                     // print the numerical value
                     ss.str ("");
                     ss << round (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
-                    if (t.high == -1)
-                    {
-                        int color = GREEN;
-                        text ({A_BOLD, color}, row++, indent1, "%4s", ss.str ().c_str ());
-                    }
-                    else
-                    {
-                        int color = GREEN;
-                        if (t.current >= t.high)
-                            color = YELLOW;
-                        if (t.current >= t.critical)
-                            color = RED;
-                        text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
-                        // print the bar
-                        const int size = 2 * cols / 3 - indent2 - 5;
-                        temp_bar (n, row++, indent2, size, t);
-                    }
+                    int color = GREEN;
+                    if (t.current >= t.high)
+                        color = YELLOW;
+                    if (t.current >= t.critical)
+                        color = RED;
+                    text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                    // print the bar
+                    const int size = 2 * cols / 3 - indent2 - 5;
+                    temp_bar (row++, indent2, size, t);
                 }
+                n = 0;
                 for (auto f : chip.fan_speeds)
                 {
                     // don't print on last line
@@ -223,7 +219,11 @@ class ncurses_ui
                         continue;
                     std::stringstream ss;
                     ss << round (f.current);
-                    text ({A_BOLD, WHITE}, row++, indent1, "FAN %4s RPM", ss.str ().c_str ());
+                    if (n == 0)
+                        text ({WHITE}, row++, 0, "  FAN");
+                    text ({A_BOLD, WHITE}, row, 0, "  %d %4s RPM", n++, ss.str ().c_str ());
+                    const int size = 2 * cols / 3 - indent3 - 5;
+                    speed_bar (row++, indent3, size, f);
                 }
                 ++row;
             }
@@ -233,13 +233,12 @@ class ncurses_ui
     /// @brief draw a temperature bar
     ///
     /// @tparam T temperature type
-    /// @param n cpu number
     /// @param i row
     /// @param j col
     /// @param size bar length
     /// @param t temperature
     template<typename T>
-    void temp_bar (size_t n, int i, int j, int size, T t) const
+    void temp_bar (int i, int j, int size, T t) const
     {
         text ({A_BOLD}, i, j, "[");
         text ({A_BOLD}, i, j + size - 1, "]");
@@ -258,6 +257,31 @@ class ncurses_ui
                 color = RED;
             if (k < len)
                 text ({A_BOLD, A_REVERSE, color}, i, j + k, " ");
+            else
+                text ({A_BOLD, color}, i, j + k, "-");
+        }
+    }
+    /// @brief draw a speed bar
+    ///
+    /// @tparam speed type
+    /// @param i row
+    /// @param j col
+    /// @param size bar length
+    /// @param s speed
+    template<typename T>
+    void speed_bar (int i, int j, int size, T t) const
+    {
+        text ({A_BOLD}, i, j, "[");
+        text ({A_BOLD}, i, j + size - 1, "]");
+        const int MIN = 20000;
+        const int MAX = 50000;
+        int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
+        int len = size * (current - MIN) / (MAX - MIN);
+        for (int k = 1; k + 1 < size; ++k)
+        {
+            int color = BLUE;
+            if (k < len)
+                text ({A_REVERSE, color}, i, j + k, " ");
             else
                 text ({A_BOLD, color}, i, j + k, "-");
         }

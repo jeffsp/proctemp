@@ -1,4 +1,4 @@
-/// @file proctempview.cc
+/// @file therm.cc
 /// @brief view processor temperatures
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @date 2013-06-30
@@ -21,7 +21,7 @@
 #include "ui.h"
 
 using namespace std;
-using namespace proctemp;
+using namespace therm;
 
 template<typename U>
 void main_loop (const sensors &s, options &opts, const string &config_fn)
@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
         sensors s;
 
         // options get saved here
-        string config_fn = get_config_dir () + "/proctempviewrc";
+        string config_fn = get_config_dir () + "/thermrc";
 
         // configurable options
         options opts;

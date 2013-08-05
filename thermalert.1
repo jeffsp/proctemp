@@ -1,8 +1,8 @@
-.TH PROCTEMPALERT 1 "July 2013" Linux "User Manuals"
+.TH THERMALERT 1 "July 2013" Linux "User Manuals"
 .SH NAME
-proctempalert \- alert the user when processor temperature becomes high
+thermalert \- alert the user when processor temperature becomes high
 .SH SYNOPSIS
-.B proctempalert [-i '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-h|--help] [-g|--gpus]
+.B thermalert [-i '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-d#|--debug=#] [-h|--help] [-g|--gpus]
 .SH DESCRIPTION
 Measure the cpu temperatures and run commands if the temperatures are high.
 .P
@@ -17,7 +17,7 @@ Use for debugging.  To force the program to behave as though a processor tempera
 1.  Set # equal to 2 to force it to behave as though a processor temperature is critical.
 
 This can be useful when you
-are configuring proctempalert to run in your crontab.
+are configuring thermalert to run in your crontab.
 .IP "-h|--help"
 Get help
 .IP "-b#|--bus=#"
@@ -39,22 +39,22 @@ Here are some example crontab entries:
 .nf
 	# every tens minutes, check if temperature is high
 .nf
-	*/10 * * * * /usr/local/bin/proctempalert --high_cmd='sensors | mail -s "`hostname` is HIGH" username@email.com' &> /dev/null
+	*/10 * * * * /usr/local/bin/thermalert --high_cmd='sensors | mail -s "`hostname` is HIGH" username@email.com' &> /dev/null
 
 .P
 .nf
 	# every two minutes, check if CPU temperature is critical
 .nf
-	*/2 * * * *	/usr/local/bin/proctempalert --bus_id=1 --critical_cmd='sensors | mail -s "`hostname` is CPU CRITICAL" username@email.com' &> /dev/null
+	*/2 * * * *	/usr/local/bin/thermalert --bus_id=1 --critical_cmd='sensors | mail -s "`hostname` is CPU CRITICAL" username@email.com' &> /dev/null
 .P
 .nf
 	# every two minutes, check if GPU temperature is critical
 .nf
-	*/2 * * * *	/usr/local/bin/proctempalert --bus_id=2 --critical_cmd='sensors | mail -s "`hostname` is GPU CRITICAL" username@email.com' &> /dev/null
+	*/2 * * * *	/usr/local/bin/thermalert --bus_id=2 --critical_cmd='sensors | mail -s "`hostname` is GPU CRITICAL" username@email.com' &> /dev/null
 
 .SH AUTHOR
 Jeff Perry <jeffsp@gmail.com>
 .SH "SEE ALSO"
-.BR proctempview(1)
+.BR therm(1)
 .BR crontab(1)
 .BR crontab(5)

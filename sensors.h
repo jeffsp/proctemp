@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-namespace proctemp
+namespace therm
 {
 
 /// @brief total number of busses to scan
@@ -194,6 +194,6 @@ class sensors
     }
 };
 
-} // namespace proctemp
+} // namespace therm
 
 #endif

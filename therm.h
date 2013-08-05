@@ -1,5 +1,5 @@
-/// @file proctemp.h
-/// @brief proctemp
+/// @file therm.h
+/// @brief therm
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @date 2013-04-30
 
@@ -18,8 +18,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef PROCTEMP_H
-#define PROCTEMP_H
+#ifndef THERM_H
+#define THERM_H
 
 #include "sensors.h"
 #include <iostream>
@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-namespace proctemp
+namespace therm
 {
 
 /// @brief version info
@@ -123,6 +123,6 @@ busses scan (const sensors &s)
     return bs;
 }
 
-} // namespace proctemp
+} // namespace therm
 
 #endif

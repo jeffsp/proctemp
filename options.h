@@ -21,12 +21,12 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include "proctemp.h"
+#include "therm.h"
 #include <fstream>
 #include <string>
 #include <sys/stat.h>
 
-namespace proctemp
+namespace therm
 {
 
 /// @brief configuration option
@@ -163,7 +163,7 @@ std::string get_config_dir ()
         config_dir = getenv ("HOME") + std::string ("/.config");
     else
         config_dir = "~/.config";
-    config_dir += "/proctemp";
+    config_dir += "/therm";
     struct stat sb;
     if (stat (config_dir.c_str (), &sb) == -1)
     {
@@ -175,6 +175,6 @@ std::string get_config_dir ()
     return config_dir;
 };
 
-} // namespace proctemp
+} // namespace therm
 
 #endif

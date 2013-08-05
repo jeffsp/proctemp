@@ -1,4 +1,4 @@
-/// @file proctempalert.cc
+/// @file thermalert.cc
 /// @brief get processor temperature and optionally send an alert if it's too high
 /// @author Jeff Perry <jeffsp@gmail.com>
 /// @date 2013-04-30
@@ -18,14 +18,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "proctemp.h"
+#include "therm.h"
 #include <cmath>
 #include <getopt.h>
 
 using namespace std;
-using namespace proctemp;
+using namespace therm;
 
-const string usage = "usage: proctempalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-b#|--bus_id=#] [-d#|--debug=#] [-?|--help]";
+const string usage = "usage: thermalert [-h '...'|--high_cmd='...'] [-c '...'|--critical_cmd='...'] [-b#|--bus_id=#] [-d#|--debug=#] [-?|--help]";
 
 int check (const busses &b, unsigned bus_id)
 {
@@ -109,7 +109,7 @@ int main (int argc, char **argv)
         };
 
         // print version info
-        clog << "proctemp version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
+        clog << "therm version " << MAJOR_REVISION << '.' << MINOR_REVISION << endl;
 
         // print the options
         clog << "debug=" << debug << endl;

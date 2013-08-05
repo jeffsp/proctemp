@@ -1,6 +1,6 @@
-#proctemp
+#therm
 
-Linux processor temperature utilities.
+Linux processor thermometer utilities.
 
 ##Installation
 
@@ -11,28 +11,28 @@ Linux processor temperature utilities.
 You must have the sensors and ncurses development libraries installed in order to compile the utilities.
 
 ##Applications
-###proctempview
+###therm
 
 Graphically show the CPU and GPU temperatures in real time in a console.
 
-###proctempalert
+###thermalert
 
 Alert the user via email if the CPU or GPU temperature becomes too high.
 
 ##Usage
-###proctempview
+###therm
 
-	user@hostname/~ $ proctempview
+	user@hostname/~ $ therm
 
-![proctempview example image](https://github.com/jeffsp/proctemp/raw/master/proctempview_example.png "proctempview example")
+![therm example image](https://github.com/jeffsp/therm/raw/master/therm_example.png "therm example")
 
-###proctempalert
+###thermalert
 
 Temperature alerts are sent via cron(8).  See _Configuration_ below.
 
 ##Configuration
 
-###proctempalert
+###thermalert
 
 To receive alerts, edit your crontab:
 
@@ -42,10 +42,10 @@ and add the following two lines (replace username@email.com with your email
 address):
 
 	# every tens minutes, check if cpu temperature is high
-	*/10	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --high_cmd='sensors -f | mail -s "`hostname` is HOT" username@email.com' > /dev/null 2>&1
+	*/10	*	*	*	*	/usr/local/bin/thermalert --debug=0 --high_cmd='sensors -f | mail -s "`hostname` is HOT" username@email.com' > /dev/null 2>&1
 
 	# every two minutes, check if cpu temperature is critical
-	*/2	*	*	*	*	/usr/local/bin/proctempalert --debug=0 --critical_cmd='sensors -f | mail -s "`hostname` is CRITICALLY HOT" username@email.com' > /dev/null 2>&1
+	*/2	*	*	*	*	/usr/local/bin/thermalert --debug=0 --critical_cmd='sensors -f | mail -s "`hostname` is CRITICALLY HOT" username@email.com' > /dev/null 2>&1
 
 If you want to make sure you have it setup correctly, change the first
 '--debug=0' with '--debug=1' and the second '--debug=0' with '--debug=2'.  If

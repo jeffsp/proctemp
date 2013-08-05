@@ -28,7 +28,7 @@
 #include <ncurses.h>
 #include <sstream>
 
-namespace proctemp
+namespace therm
 {
 
 /// @brief draw ncurses text with attributes
@@ -269,7 +269,7 @@ class ncurses_ui
         const int COL = 2 * cols / 3;
         std::stringstream ss;
         ss.str ("");
-        ss << "proctempview version " << proctemp::MAJOR_REVISION << '.' << proctemp::MINOR_REVISION;
+        ss << "therm version " << therm::MAJOR_REVISION << '.' << therm::MINOR_REVISION;
         text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
         ss << "T = change Temperature scale";
@@ -357,6 +357,6 @@ class debug_ui
     }
 };
 
-} // namespace proctemp
+} // namespace therm
 
 #endif

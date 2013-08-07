@@ -34,13 +34,16 @@ namespace therm
 /// @brief draw ncurses text with attributes
 ///
 /// @param attrs vector of attrs
+/// @param rows total rows
 /// @param r row
 /// @param c col
 /// @param s string
 /// @param args print args
 template<typename... T>
-void text (const std::vector<int> &attrs, int r, int c, const char *s, T... args)
+void text (const std::vector<int> &attrs, int rows, int r, int c, const char *s, T... args)
 {
+    if (r + 1 == rows)
+        return;
     for (auto a : attrs)
         attron (a);
     mvprintw (r, c, s, args...);
@@ -170,17 +173,14 @@ class ncurses_ui
         auto row = 0;
         for (auto bus : bs)
         {
-            text ({}, row++, 0, "%s", bus.name.c_str ());
+            text ({}, rows, row++, 0, "%s", bus.name.c_str ());
             size_t chipno = 0;
             for (auto chip : bus.chips)
             {
-                // don't print on last line
-                if (row + 1 == rows)
-                    continue;
                 if (bus.chips.size () > 1)
-                    text ({}, row++, 0, "%s %d", chip.name.c_str (), chipno++);
+                    text ({}, rows, row++, 0, "%s %d", chip.name.c_str (), chipno++);
                 else
-                    text ({}, row++, 0, "%s", chip.name.c_str ());
+                    text ({}, rows, row++, 0, "%s", chip.name.c_str ());
                 size_t n = 0;
                 for (auto t : chip.temps)
                 {
@@ -189,15 +189,12 @@ class ncurses_ui
                         t.high = 80;
                     if (t.critical == -1)
                         t.critical = 90;
-                    // don't print on last line
-                    if (row + 1 == rows)
-                        continue;
                     if (debug && !(rand () % chip.temps.size ()))
                         t.current = (rand () % int (t.critical + 10 - t.high)) + t.high;
                     // print the cpu number
                     std::stringstream ss;
                     ss << n++;
-                    text ({}, row, 0, ss.str ().c_str ());
+                    text ({}, rows, row, 0, ss.str ().c_str ());
                     // print the numerical value
                     ss.str ("");
                     ss << round (opts.get_fahrenheit () ? ctof (t.current) : t.current) << (opts.get_fahrenheit () ? 'F' : 'C');
@@ -206,7 +203,7 @@ class ncurses_ui
                         color = YELLOW;
                     if (t.current >= t.critical)
                         color = RED;
-                    text ({A_BOLD, color}, row, indent1, "%4s", ss.str ().c_str ());
+                    text ({A_BOLD, color}, rows, row, indent1, "%4s", ss.str ().c_str ());
                     // print the bar
                     const int size = 2 * cols / 3 - indent2 - 5;
                     temp_bar (row++, indent2, size, t);
@@ -214,14 +211,11 @@ class ncurses_ui
                 n = 0;
                 for (auto f : chip.fan_speeds)
                 {
-                    // don't print on last line
-                    if (row + 1 == rows)
-                        continue;
                     std::stringstream ss;
                     ss << round (f.current);
                     if (n == 0)
-                        text ({WHITE}, row++, 0, "  FAN");
-                    text ({A_BOLD, WHITE}, row, 0, "  %d %4s RPM", n++, ss.str ().c_str ());
+                        text ({WHITE}, rows, row++, 0, "  FAN");
+                    text ({A_BOLD, WHITE}, rows, row, 0, "  %d %4s RPM", n++, ss.str ().c_str ());
                     const int size = 2 * cols / 3 - indent3 - 5;
                     speed_bar (row++, indent3, size, f);
                 }
@@ -240,8 +234,8 @@ class ncurses_ui
     template<typename T>
     void temp_bar (int i, int j, int size, T t) const
     {
-        text ({A_BOLD}, i, j, "[");
-        text ({A_BOLD}, i, j + size - 1, "]");
+        text ({A_BOLD}, rows, i, j, "[");
+        text ({A_BOLD}, rows, i, j + size - 1, "]");
         const int MIN = 40;
         const int MAX = t.critical + 5;
         int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
@@ -256,9 +250,9 @@ class ncurses_ui
             else
                 color = RED;
             if (k < len)
-                text ({A_BOLD, A_REVERSE, color}, i, j + k, " ");
+                text ({A_BOLD, A_REVERSE, color}, rows, i, j + k, " ");
             else
-                text ({A_BOLD, color}, i, j + k, "-");
+                text ({A_BOLD, color}, rows, i, j + k, "-");
         }
     }
     /// @brief draw a speed bar
@@ -271,19 +265,19 @@ class ncurses_ui
     template<typename T>
     void speed_bar (int i, int j, int size, T t) const
     {
-        text ({A_BOLD}, i, j, "[");
-        text ({A_BOLD}, i, j + size - 1, "]");
+        text ({A_BOLD}, rows, i, j, "[");
+        text ({A_BOLD}, rows, i, j + size - 1, "]");
         const int MIN = 20000;
-        const int MAX = 50000;
+        const int MAX = 90000;
         int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
         int len = size * (current - MIN) / (MAX - MIN);
         for (int k = 1; k + 1 < size; ++k)
         {
             int color = BLUE;
             if (k < len)
-                text ({A_REVERSE, color}, i, j + k, " ");
+                text ({A_REVERSE, color}, rows, i, j + k, " ");
             else
-                text ({A_BOLD, color}, i, j + k, "-");
+                text ({A_BOLD, color}, rows, i, j + k, "-");
         }
     }
     /// @brief draw labels
@@ -294,32 +288,32 @@ class ncurses_ui
         std::stringstream ss;
         ss.str ("");
         ss << "therm version " << therm::MAJOR_REVISION << '.' << therm::MINOR_REVISION;
-        text ({A_BOLD, BLUE}, rows - 1, 0, ss.str ().c_str ());
+        text ({A_BOLD, BLUE}, rows + 1, rows - 1, 0, ss.str ().c_str ());
         ss.str ("");
         ss << "T = change Temperature scale";
-        text ({}, row++, COL, ss.str ().c_str ());
+        text ({}, rows, row++, COL, ss.str ().c_str ());
         ss.str ("");
         ss << "S = Save configuration options";
-        text ({}, row++, COL, ss.str ().c_str ());
+        text ({}, rows, row++, COL, ss.str ().c_str ());
         ss.str ("");
         ss << "Q = Quit";
-        text ({}, row++, COL, ss.str ().c_str ());
+        text ({}, rows, row++, COL, ss.str ().c_str ());
         if (debug)
         {
             ++row;
             ss.str ("");
             ss << "ncurses version " << NCURSES_VERSION_MAJOR << '.' << NCURSES_VERSION_MINOR;
-            text ({}, row++, COL, ss.str ().c_str ());
+            text ({}, rows, row++, COL, ss.str ().c_str ());
             ss.str ("");
             ss << "terminal dimensions " << rows << " X " << cols;
-            text ({}, row++, COL, ss.str ().c_str ());
+            text ({}, rows, row++, COL, ss.str ().c_str ());
             ++row;
             ss.str ("");
             ss << "YOU ARE IN DEBUG MODE.";
-            text ({}, row++, COL, ss.str ().c_str ());
+            text ({}, rows, row++, COL, ss.str ().c_str ());
             ss.str ("");
             ss << "PRESS '!' TO TURN OFF DEBUG MODE.";
-            text ({}, row++, COL, ss.str ().c_str ());
+            text ({}, rows, row++, COL, ss.str ().c_str ());
         }
     }
 };

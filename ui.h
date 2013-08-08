@@ -234,18 +234,16 @@ class ncurses_ui
     template<typename T>
     void temp_bar (int i, int j, int size, T t) const
     {
-        text ({A_BOLD}, rows, i, j, "[");
-        text ({A_BOLD}, rows, i, j + size - 1, "]");
         const int MIN = 40;
         const int MAX = t.critical + 5;
         int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
         int len = size * (current - MIN) / (MAX - MIN);
-        for (int k = 1; k + 1 < size; ++k)
+        for (int k = 0; k < size; ++k)
         {
             int color;
-            if (k < size * (t.high - MIN) / (MAX - MIN))
+            if (k < round (size * (t.high - MIN) / (MAX - MIN)))
                 color = GREEN;
-            else if (k < size * (t.critical - MIN) / (MAX - MIN))
+            else if (k < round (size * (t.critical - MIN) / (MAX - MIN)))
                 color = YELLOW;
             else
                 color = RED;
@@ -254,6 +252,8 @@ class ncurses_ui
             else
                 text ({A_BOLD, color}, rows, i, j + k, "-");
         }
+        text ({A_BOLD}, rows, i, j, "[");
+        text ({A_BOLD}, rows, i, j + size - 1, "]");
     }
     /// @brief draw a speed bar
     ///

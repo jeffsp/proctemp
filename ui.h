@@ -234,20 +234,21 @@ class ncurses_ui
     template<typename T>
     void temp_bar (int i, int j, int size, T t) const
     {
-        const int MIN = 40;
-        const int MAX = t.critical + 5;
-        int current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
-        int len = size * (current - MIN) / (MAX - MIN);
+        const float MIN = 40;
+        const float MAX = t.critical + 5;
+        float current = t.current < MIN ? MIN : (t.current > MAX ? MAX : t.current);
+        float SZ = (MAX - MIN);
+        float len = size * (current - MIN) / SZ;
         for (int k = 0; k < size; ++k)
         {
             int color;
-            if (k < round (size * (t.high - MIN) / (MAX - MIN)))
+            if (k <= (size * (t.high - MIN) / SZ))
                 color = GREEN;
-            else if (k < round (size * (t.critical - MIN) / (MAX - MIN)))
+            else if (k <= (size * (t.critical - MIN) / SZ))
                 color = YELLOW;
             else
                 color = RED;
-            if (k < len)
+            if (k <= len)
                 text ({A_BOLD, A_REVERSE, color}, rows, i, j + k, " ");
             else
                 text ({A_BOLD, color}, rows, i, j + k, "-");

@@ -24,7 +24,7 @@ Alert the user via email if the CPU or GPU temperature becomes too high.
 
 	user@hostname/~ $ therm
 
-![therm example image](https://github.com/jeffsp/therm/raw/master/therm_example.png "therm example")
+![therm example image](https://github.com/jeffsp/therm/raw/master/therm_example0.png "therm example")
 
 ###thermalert
 

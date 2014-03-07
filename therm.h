@@ -32,7 +32,7 @@ namespace therm
 
 /// @brief version info
 const int MAJOR_REVISION = 0;
-const int MINOR_REVISION = 2;
+const int MINOR_REVISION = 3;
 
 /// @brief convert from fahrenheit to celsius
 ///

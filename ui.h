@@ -68,6 +68,8 @@ class ncurses_ui
     static const int YELLOW = COLOR_PAIR(3);
     static const int RED = COLOR_PAIR(4);
     static const int BLUE = COLOR_PAIR(5);
+    static const int GRAY_ON_CYAN = COLOR_PAIR(6);
+    static const int RED_ON_CYAN = COLOR_PAIR(7);
     public:
     /// @brief constructor
     ncurses_ui (options &opts)
@@ -100,6 +102,8 @@ class ncurses_ui
         init_pair (3, COLOR_YELLOW, -1);
         init_pair (4, COLOR_RED, -1);
         init_pair (5, COLOR_BLUE, -1);
+        init_pair (6, COLOR_WHITE, COLOR_CYAN);
+        init_pair (7, COLOR_RED, COLOR_CYAN);
         timeout (1000); // timeout in ms
     }
     /// @brief ncurses cleanup
@@ -205,7 +209,7 @@ class ncurses_ui
                         color = RED;
                     text ({A_BOLD, color}, rows, row, indent1, "%4s", ss.str ().c_str ());
                     // print the bar
-                    const int size = 2 * cols / 3 - indent2 - 5;
+                    const int size = cols - indent2;
                     temp_bar (row++, indent2, size, t);
                 }
                 n = 0;
@@ -216,7 +220,7 @@ class ncurses_ui
                     if (n == 0)
                         text ({WHITE}, rows, row++, 0, "  FAN");
                     text ({A_BOLD, WHITE}, rows, row, 0, "  %d %4s RPM", n++, ss.str ().c_str ());
-                    const int size = 2 * cols / 3 - indent3 - 5;
+                    const int size = cols - indent3;
                     speed_bar (row++, indent3, size, f);
                 }
                 ++row;
@@ -284,37 +288,46 @@ class ncurses_ui
     /// @brief draw labels
     void labels () const
     {
-        int row = 0;
-        const int COL = 2 * cols / 3;
+        int col = 0;
         std::stringstream ss;
         ss.str ("");
         ss << "therm version " << therm::MAJOR_REVISION << '.' << therm::MINOR_REVISION;
-        text ({A_BOLD, BLUE}, rows + 1, rows - 1, 0, ss.str ().c_str ());
+        text ({A_BOLD, BLUE}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size () + 1;
         ss.str ("");
-        ss << "T = change Temperature scale";
-        text ({}, rows, row++, COL, ss.str ().c_str ());
+        ss << "T";
+        text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
         ss.str ("");
-        ss << "S = Save configuration options";
-        text ({}, rows, row++, COL, ss.str ().c_str ());
+        ss << "Temp scale  ";
+        text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
         ss.str ("");
-        ss << "Q = Quit";
-        text ({}, rows, row++, COL, ss.str ().c_str ());
+        ss << "S";
+        text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
+        ss.str ("");
+        ss << "Save config ";
+        text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
+        ss.str ("");
+        ss << "Q";
+        text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
+        ss.str ("");
+        ss << "Quit        ";
+        text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
+        col += ss.str ().size ();
         if (debug)
         {
-            ++row;
             ss.str ("");
-            ss << "ncurses version " << NCURSES_VERSION_MAJOR << '.' << NCURSES_VERSION_MINOR;
-            text ({}, rows, row++, COL, ss.str ().c_str ());
+            ss << "!";
+            text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
+            col += ss.str ().size ();
             ss.str ("");
-            ss << "terminal dimensions " << rows << " X " << cols;
-            text ({}, rows, row++, COL, ss.str ().c_str ());
-            ++row;
-            ss.str ("");
-            ss << "YOU ARE IN DEBUG MODE.";
-            text ({}, rows, row++, COL, ss.str ().c_str ());
-            ss.str ("");
-            ss << "PRESS '!' TO TURN OFF DEBUG MODE.";
-            text ({}, rows, row++, COL, ss.str ().c_str ());
+        ss << "Debug OFF  ";
+            text ({RED_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
+            col += ss.str ().size ();
         }
     }
 };

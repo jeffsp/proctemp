@@ -299,7 +299,7 @@ class ncurses_ui
         text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         ss.str ("");
-        ss << "Temp scale  ";
+        ss << "emp scale  ";
         text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         ss.str ("");
@@ -307,7 +307,7 @@ class ncurses_ui
         text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         ss.str ("");
-        ss << "Save config ";
+        ss << "ave config ";
         text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         ss.str ("");
@@ -315,7 +315,7 @@ class ncurses_ui
         text ({}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         ss.str ("");
-        ss << "Quit        ";
+        ss << "uit        ";
         text ({GRAY_ON_CYAN}, rows + 1, rows - 1, col, ss.str ().c_str ());
         col += ss.str ().size ();
         if (debug)
